@@ -38,34 +38,41 @@
             android:src="@drawable/ic_log" />
     </RelativeLayout>
 
+<!-- Main Body -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="10dp"
+        android:layout_height="400dp"
+        android:layout_marginTop="50dp"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout2"
         tools:layout_editor_absoluteX="0dp">
 
+        <!-- Bagian Kiri -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginLeft="3dp"
+            android:layout_alignParentLeft="true">
+
+            <!-- rtSuhuBat -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/bg_2dp"
-                android:padding="10dp"
                 android:orientation="vertical"
                 android:gravity="center">
                 <TextView
                     style="@style/Text.Sensor"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Suhu Baterai"/>
+                    android:text="Suhu Baterai"
+                    android:paddingTop="5dp"/>
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:paddingBottom="5dp">
                     <TextView
                         android:id="@+id/rtSuhuBat"
                         android:layout_width="wrap_content"
@@ -78,19 +85,209 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="25dp"
                         android:background="none"
-                        android:padding="0dp"
+                        android:paddingLeft="8dp"
                         android:text="&#xb0;C"/>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <!-- rtTekananUdara -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@color/bg_2dp">
+                <TextView
+                    style="@style/Text.Sensor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tekanan Udara"
+                    android:paddingTop="5dp"/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:paddingBottom="5dp">
+                    <TextView
+                        android:id="@+id/rtTekananUdara"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Text.Sensor"
+                        android:text="1010"/>
+                    <TextView
+                        style="@style/Text.Sensor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="50dp"
+                        android:background="none"
+                        android:paddingLeft="20dp"
+                        android:text="mBar"/>
+                </RelativeLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Bagian Kanan -->
+        <LinearLayout
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginRight="3dp"
+            android:layout_alignParentEnd="true">
+
+            <!-- rtSuhuUdara -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/bg_2dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
+                <TextView
+                    style="@style/Text.Sensor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Suhu Udara"/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginTop="10dp">
+                    <TextView
+                        android:id="@+id/rtSuhuUdara"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Text.Sensor"
+                        android:text="30"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="&#xb0;C"
+                        style="@style/Text.Sensor"
+                        android:paddingLeft="8dp"
+                        android:layout_marginLeft="25dp"/>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <!-- rtCpu -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/bg_2dp"
+                android:orientation="vertical"
+                android:layout_marginTop="10dp"
+                android:gravity="center">
+                <TextView
+                    style="@style/Text.Sensor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CPU Usage"/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="5dp"
+                    android:layout_marginTop="10dp">
+                    <TextView
+                        android:id="@+id/rtCpu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Text.Sensor"
+                        android:text="30"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="%"
+                        style="@style/Text.Sensor"
+                        android:paddingLeft="8dp"
+                        android:layout_marginLeft="25dp"/>
                 </RelativeLayout>
             </LinearLayout>
 
         </LinearLayout>
 
+        <!-- rtKelembabanUdara -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="@color/bg_2dp"
+            android:layout_marginTop="200dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                style="@style/Text.Sensor"
+                android:text="Kelembaban Udara"
+                android:paddingTop="5dp"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rtKelembabanUdara"
+                    style="@style/Text.Sensor"
+                    android:text="80"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Text.Sensor"
+                    android:textAlignment="center"
+                    android:text="%"
+                    android:layout_marginLeft="50dp"/>
+            </RelativeLayout>
 
         </LinearLayout>
+
+        <!-- userID -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/bg_2dp"
+            android:layout_marginTop="300dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="USER ID"
+                style="@style/Text.Sensor"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/userID"
+                style="@style/Text"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:layout_marginTop="20dp"
+                android:text="12345678910234567890123456798012"/>
+        </LinearLayout>
+
     </RelativeLayout>
+
+    <!-- Menu Bottom Navigation -->
+    <LinearLayout
+        android:id="@+id/linearLayout4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            style="@style/menu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:menu="@menu/bottom_navigation_menu" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
