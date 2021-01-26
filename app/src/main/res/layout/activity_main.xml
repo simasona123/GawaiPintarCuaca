@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+<!-- JudulApps -->
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/bg_8dp">
+        <TextView
+            android:id="@+id/judulApps"
+            style="@style/Text.title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gawai Pintar Cuaca"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
+
+<!-- lokasi -->
+    <TextView
+        android:id="@+id/lokasi"
+        style="@style/Text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Lokasi"
+        android:textAlignment="center"
+        android:textSize="22sp"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+<!-- cuacaIcon -->
+    <ImageView
+        android:id="@+id/cuacaIcon"
+        android:layout_width="163dp"
+        android:layout_height="163dp"
+        android:src="@drawable/ic_cloudy"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lokasi"
+        tools:ignore="ContentDescription" />
+
+<!-- waktu -->
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/cuacaIcon"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/waktu"
+            style="@style/parameterCuaca"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Senin, 12 Januari 2021 06:00" />
+    </RelativeLayout>
+
+<!-- suhu -->
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
+
+        <TextView
+            android:id="@+id/suhu"
+            style="@style/parameterCuaca"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="0dp"
+            android:text="30"
+            android:textSize="50sp"
+            app:layout_constraintTop_toBottomOf="@+id/cuacaIcon" />
+
+        <TextView
+            style="@style/Text.title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="0dp"
+            android:background="none"
+            android:padding="0dp"
+            android:text="&#xb0;C"
+            android:textSize="50sp" />
+
+
+    </LinearLayout>
+
+<!-- tekanan dan kelembaban -->
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/kelembaban"
+                style="@style/parameterCuaca"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="80" />
+
+            <TextView
+                style="@style/parameterCuaca"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" %" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp">
+
+            <TextView
+                android:id="@+id/tekanan"
+                style="@style/parameterCuaca"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1010" />
+
+            <TextView
+                style="@style/parameterCuaca"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text=" mBar"
+                android:textSize="20sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+<!-- Prakiraan kedepan -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
+        android:layout_marginBottom="20dp">
+
+        <!-- Card1 -->
+        <LinearLayout
+            style="@style/card"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_margin="20dp"
+            android:padding="5dp">
+            <TextView
+                android:id="@+id/waktu1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/parameterCuaca"
+                android:text="11 Januari 12:00"/>
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_cloudy"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/suhu1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/parameterCuaca"
+                    android:text="20"/>
+                <TextView
+                    style="@style/parameterCuaca"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="0dp"
+                    android:background="none"
+                    android:padding="0dp"
+                    android:text="&#xb0;C"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+                <TextView
+                    android:id="@+id/kelembaban1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/parameterCuaca"
+                    android:text="85"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/parameterCuaca"
+                    android:text=" %"/>
+                <TextView
+                    android:id="@+id/tekanan1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/parameterCuaca"
+                    android:paddingLeft="10dp"
+                    android:text="1010"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/parameterCuaca"
+                    android:text=" mbar"/>
+
+            </LinearLayout>
+        </LinearLayout>
+        <!-- Card2 -->
+        <LinearLayout
+            style="@style/card"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_margin="20dp"
+            android:padding="5dp">
+            <TextView
+                android:id="@+id/waktu2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/parameterCuaca"
+                android:text="11 Januari 12:00"/>
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_cloudy"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/suhu2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/parameterCuaca"
+                    android:text="20"/>
+                <TextView
+                    style="@style/parameterCuaca"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="0dp"
+                    android:background="none"
+                    android:padding="0dp"
+                    android:text="&#xb0;C"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+                <TextView
+                    android:id="@+id/kelembaban2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/parameterCuaca"
+                    android:text="85"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/parameterCuaca"
+                    android:text=" %"/>
+                <TextView
+                    android:id="@+id/tekanan2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/parameterCuaca"
+                    android:paddingLeft="10dp"
+                    android:text="1010"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/parameterCuaca"
+                    android:text=" mbar"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+<!-- Menu Bottom Navigation -->
+    <LinearLayout
+        android:id="@+id/linearLayout4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            style="@style/menu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:menu="@menu/bottom_navigation_menu" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
