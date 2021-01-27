@@ -35,7 +35,8 @@
             android:layout_marginRight="20dp"
             android:paddingTop="10dp"
             android:scaleType="fitEnd"
-            android:src="@drawable/ic_log" />
+            android:src="@drawable/ic_log"
+            android:onClick="bukaLogActivity"/>
     </RelativeLayout>
 
 <!-- Main Body -->
