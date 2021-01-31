@@ -7,8 +7,6 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -28,7 +26,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.w3c.dom.Text;
 
-public class MainActivity extends Activity implements BottomNavigationView.OnNavigationItemSelectedListener {
+public class BackupMainAc extends Activity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private static final String LOG_TAG = "MainActivity";
     private static final int REQUEST_LOCATION_PERMISSION = 1;
@@ -37,7 +35,6 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     String longitude;
     String timeStamp;
     String lokasi;
-
 
     private TextView lokasiMainTextView;
     Location lokasiMain;
@@ -50,15 +47,26 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
         setContentView(R.layout.activity_main);
         Log.d(LOG_TAG,"On Create");
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        TextView lokasiMainTextView =(TextView) findViewById(R.id.lokasi);
-
+        TextView lokasiMainTextView = findViewById(R.id.lokasi);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
 
-        lokasiMainTextView.setText("Mencari.....");
         locationAccessPermission();
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        new LocationTask(fusedLocationProviderClient, lokasiMainTextView).execute();
+        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @SuppressLint("DefaultLocale")
+            @Override
+            public void onSuccess(Location location) {
+                lokasiMain = location;
+                latitude = String.format("%.4f",location.getLatitude());
+                longitude = String.format("%.4f",location.getLongitude());
+                timeStamp = String.valueOf(location.getTime());
+                lokasi = "Latitude: " + latitude + "Longitude: " + longitude + "Timestamp: " + timeStamp ;
+                Log.d(LOG_TAG, lokasi);
+            }
+        });
+
+
 
     }
 
