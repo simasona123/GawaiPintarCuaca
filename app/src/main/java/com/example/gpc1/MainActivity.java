@@ -79,7 +79,9 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
         kabupaten = "";
         for (int i = 1; i < kab.length ; i++){
             kabupaten += kab[i];
-            kabupaten += " ";
+            if(i != kab.length -1){
+                kabupaten += " ";
+            }
         }
         this.kabupaten = kabupaten;
         this.provinsi = provinsi;
