@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,10 +26,13 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.tabs.TabLayout;
 
 import org.w3c.dom.Text;
 
-public class MainActivity extends Activity implements BottomNavigationView.OnNavigationItemSelectedListener {
+import java.util.Locale;
+
+public class MainActivity extends Activity implements BottomNavigationView.OnNavigationItemSelectedListener, LocationTask.AsyncResponse {
 
     private static final String LOG_TAG = "MainActivity";
     private static final int REQUEST_LOCATION_PERMISSION = 1;
@@ -37,11 +41,14 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     String longitude;
     String timeStamp;
     String lokasi;
+    String provinsi;
+    String kabupaten;
 
 
     private TextView lokasiMainTextView;
     Location lokasiMain;
     FusedLocationProviderClient fusedLocationProviderClient;
+    Geocoder geocoder;
 
     @SuppressLint("MissingPermission")
     @Override
@@ -50,7 +57,7 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
         setContentView(R.layout.activity_main);
         Log.d(LOG_TAG,"On Create");
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        TextView lokasiMainTextView =(TextView) findViewById(R.id.lokasi);
+        lokasiMainTextView = findViewById(R.id.lokasi);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
 
@@ -58,10 +65,33 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
         locationAccessPermission();
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        new LocationTask(fusedLocationProviderClient, lokasiMainTextView).execute();
+        geocoder = new Geocoder(this, Locale.getDefault());
+        new LocationTask(this,this, geocoder, fusedLocationProviderClient, lokasiMainTextView).execute();
 
+        if (savedInstanceState != null){
+            lokasiMainTextView.setText(savedInstanceState.getString("Lokasi Terakhir"));
+        }
     }
 
+    @Override
+    public void processFinish(String kabupaten, String provinsi) {
+        String[] kab =kabupaten.split(" ");
+        kabupaten = "";
+        for (int i = 1; i < kab.length ; i++){
+            kabupaten += kab[i];
+            kabupaten += " ";
+        }
+        this.kabupaten = kabupaten;
+        this.provinsi = provinsi;
+        Log.e(LOG_TAG, kabupaten + provinsi);
+        new XMLParsingTask(kabupaten, provinsi).execute();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("Lokasi Terakhir", lokasiMainTextView.getText().toString());
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
