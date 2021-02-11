@@ -85,9 +85,9 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
                     lokasiMain.getLongitude(),
                     1);
         }
-        catch (IOException ioException){
+        catch (IOException | NullPointerException e){
             resultMesage = "Service Not Available";
-            Log.e(TAG, resultMesage, ioException);
+            Log.e(TAG, resultMesage, e);
             System.out.println(TAG + resultMesage);
         }
         catch (IllegalArgumentException illegalArgumentException){

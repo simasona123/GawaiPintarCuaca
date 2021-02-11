@@ -71,6 +71,7 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
         if (savedInstanceState != null){
             lokasiMainTextView.setText(savedInstanceState.getString("Lokasi Terakhir"));
         }
+
     }
 
     @Override

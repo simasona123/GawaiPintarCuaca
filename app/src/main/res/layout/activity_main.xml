@@ -130,7 +130,11 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
-
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="RH Udara "
+                            style="@style/parameterCuaca"/>
                         <TextView
                             android:id="@+id/kelembaban"
                             style="@style/parameterCuaca"
@@ -144,27 +148,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text=" %" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp">
-
-                        <TextView
-                            android:id="@+id/tekanan"
-                            style="@style/parameterCuaca"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1010" />
-
-                        <TextView
-                            style="@style/parameterCuaca"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:text=" mBar"
-                            android:textSize="20sp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -235,6 +218,12 @@
                             android:orientation="horizontal">
 
                             <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="RH Udara "
+                                style="@style/parameterCuaca"/>
+
+                            <TextView
                                 android:id="@+id/kelembaban1"
                                 style="@style/parameterCuaca"
                                 android:layout_width="wrap_content"
@@ -246,20 +235,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text=" %" />
-
-                            <TextView
-                                android:id="@+id/tekanan1"
-                                style="@style/parameterCuaca"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:paddingLeft="10dp"
-                                android:text="1010" />
-
-                            <TextView
-                                style="@style/parameterCuaca"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text=" mbar" />
 
                         </LinearLayout>
                     </LinearLayout>
@@ -316,6 +291,11 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="RH Udara "
+                                style="@style/parameterCuaca"/>
 
                             <TextView
                                 android:id="@+id/kelembaban2"
@@ -329,20 +309,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text=" %" />
-
-                            <TextView
-                                android:id="@+id/tekanan2"
-                                style="@style/parameterCuaca"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:paddingLeft="10dp"
-                                android:text="1010" />
-
-                            <TextView
-                                style="@style/parameterCuaca"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text=" mbar" />
 
                         </LinearLayout>
                     </LinearLayout>
