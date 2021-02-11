@@ -185,6 +185,7 @@
                             android:text="11 Januari 12:00" />
 
                         <ImageView
+                            android:id="@+id/cuacaIcon1"
                             android:layout_width="80dp"
                             android:layout_height="80dp"
                             android:scaleType="fitXY"
@@ -260,6 +261,7 @@
                             android:text="11 Januari 12:00" />
 
                         <ImageView
+                            android:id="@+id/cuacaIcon2"
                             android:layout_width="80dp"
                             android:layout_height="80dp"
                             android:scaleType="fitXY"

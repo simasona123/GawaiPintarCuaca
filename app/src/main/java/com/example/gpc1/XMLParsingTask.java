@@ -10,6 +10,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
@@ -38,12 +39,20 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
     private ArrayList<Integer> kelembaban = new ArrayList<>();
     private ArrayList<Float> suhu = new ArrayList<>();
     private ArrayList<Integer> kodeCuaca = new ArrayList<>();
+    private ArrayList<Date> waktuCuaca = new ArrayList<>();
 
     int x;
 
-    public XMLParsingTask(String kabupaten1, String provinsi1) {
+    XMLParsingTaskResponses listener = null;
+
+    public interface XMLParsingTaskResponses {
+        void processFinish (ArrayList <Integer> kelembaban, ArrayList<Float> suhu, ArrayList<Integer> kodeCuaca, ArrayList<Date> waktucuaca);
+    }
+
+    public XMLParsingTask(XMLParsingTaskResponses listener, String kabupaten1, String provinsi1) {
         this.kabupaten = kabupaten1;
         this.provinsi = provinsi1;
+        this.listener = listener;
     }
 
     @Override
@@ -100,6 +109,7 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
                                             if (waktu1.after(waktu) && x < 3){
                                                 x = x + 1;
                                                 System.out.println("x = " + x);
+                                                waktuCuaca.add(waktu1);
                                                 while (xmlPullParser.next()!=xmlPullParser.END_TAG){
                                                     if(xmlPullParser.getEventType()!=xmlPullParser.START_TAG){
                                                         tagName = xmlPullParser.getName();
@@ -229,10 +239,7 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        System.out.println(kelembaban);
-        System.out.println(suhu);
-        System.out.println(kodeCuaca);
-
+        listener.processFinish(kelembaban,suhu,kodeCuaca,waktuCuaca);
     }
 
     private void skip (XmlPullParser xmlPullParser) throws XmlPullParserException, IOException{
