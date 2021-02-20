@@ -28,7 +28,7 @@ import java.util.Locale;
 
 public class LocationTask extends AsyncTask <Void, Void, String> {
 
-    private final String TAG = LocationTask.class.getSimpleName();
+    private final String TAG =  LocationTask.class.getSimpleName();
     String latitude;
     String longitude;
     String lokasi;
@@ -36,6 +36,7 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
     Location lokasiMain;
     String kabupaten;
     String provinsi;
+    String altitude;
 
     private final WeakReference <Context> context;
     private final WeakReference <TextView> mTextView;
@@ -59,6 +60,7 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
     @SuppressLint("MissingPermission")
     @Override
     protected String doInBackground(Void... voids) {
+        lokasi = "Harap Nyalakan GPS anda....";
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
             @SuppressLint("DefaultLocale")
             @Override
@@ -66,8 +68,48 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
                 lokasiMain = location;
                 latitude = String.format("%.4f",location.getLatitude());
                 longitude = String.format("%.4f",location.getLongitude());
-                timeStamp = String.valueOf(location.getTime());
-                System.out.println("A = " + lokasi);
+                altitude = String.valueOf(location.getAltitude());
+                System.out.println("Ketinggian = " + altitude);
+                List <Address> addresses = null;
+                String resultMesage = "";
+                try{
+                    addresses = geocoder.getFromLocation(
+                            lokasiMain.getLatitude(), /// Null pointer
+                            lokasiMain.getLongitude(),
+                            1);
+                }
+                catch (IOException | NullPointerException e){
+                    resultMesage = "Service Not Available";
+                    Log.e(TAG, resultMesage, e);
+                    System.out.println(TAG + resultMesage);
+                }
+                catch (IllegalArgumentException illegalArgumentException){
+                    resultMesage = "Invalid Coordinates Supplied";
+                    Log.e(TAG, resultMesage, illegalArgumentException);
+                    System.out.println(TAG + resultMesage);
+                }
+                if (addresses == null || addresses.size() == 0){
+                    if (resultMesage.isEmpty()){
+                        resultMesage = "Address Not Found";
+                        Log.e(TAG, resultMesage);
+                        System.out.println(TAG + resultMesage);
+                        lokasi = resultMesage;
+                    }
+                }
+                else{
+                    Address address = addresses.get(0);
+                    ArrayList <String> addressParts = new ArrayList<>();
+                    for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
+                        addressParts.add(address.getAddressLine(i));
+                        System.out.println("Array = " + addressParts.get(i));
+                    }
+                    resultMesage = TextUtils.join("\n", addressParts);
+                    kabupaten = address.getSubAdminArea();
+                    provinsi = address.getAdminArea();
+                    Log.e(TAG, resultMesage);
+                    System.out.println(TAG + " : " + resultMesage);
+                    lokasi = kabupaten + ", " + provinsi;
+                }
             }
         });
         try{
@@ -75,46 +117,6 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
         }
         catch (InterruptedException e){
             e.printStackTrace();
-        }
-        System.out.println("B = "+ lokasi);
-        List <Address> addresses = null;
-        String resultMesage = "";
-        try{
-            addresses = geocoder.getFromLocation(
-                    lokasiMain.getLatitude(),
-                    lokasiMain.getLongitude(),
-                    1);
-        }
-        catch (IOException | NullPointerException e){
-            resultMesage = "Service Not Available";
-            Log.e(TAG, resultMesage, e);
-            System.out.println(TAG + resultMesage);
-        }
-        catch (IllegalArgumentException illegalArgumentException){
-            resultMesage = "Invalid Coordinates Supplied";
-            Log.e(TAG, resultMesage, illegalArgumentException);
-            System.out.println(TAG + resultMesage);
-        }
-        if (addresses == null || addresses.size() == 0){
-            if (resultMesage.isEmpty()){
-                resultMesage = "Address Not Found";
-                Log.e(TAG, resultMesage);
-                System.out.println(TAG + resultMesage);
-            }
-        }
-        else{
-            Address address = addresses.get(0);
-            ArrayList <String> addressParts = new ArrayList<>();
-            for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
-                addressParts.add(address.getAddressLine(i));
-                System.out.println("Array = " + addressParts.get(i));
-            }
-            resultMesage = TextUtils.join("\n", addressParts);
-            kabupaten = address.getSubAdminArea();
-            provinsi = address.getAdminArea();
-            Log.e(TAG, resultMesage);
-            System.out.println(TAG + " : " + resultMesage);
-            lokasi = kabupaten + ", " + provinsi;
         }
         return lokasi;
     }

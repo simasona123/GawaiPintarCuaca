@@ -13,6 +13,8 @@ public class Constants {
         a.put("DKI Jakarta", "https://data.bmkg.go.id/datamkg/MEWS/DigitalForecast/DigitalForecast-DKIJakarta.xml");
         a.put("Lampung", "https://data.bmkg.go.id/datamkg/MEWS/DigitalForecast/DigitalForecast-Lampung.xml");
         a.put("Banten", "https://data.bmkg.go.id/datamkg/MEWS/DigitalForecast/DigitalForecast-Banten.xml");
+        a.put("Sumatera Utara", "https://data.bmkg.go.id/datamkg/MEWS/DigitalForecast/DigitalForecast-SumateraUtara.xml");
         return Collections.unmodifiableMap(a);
     }
+
 }

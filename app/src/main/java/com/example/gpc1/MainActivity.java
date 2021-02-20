@@ -10,11 +10,17 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,11 +41,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.UUID;
 
 public class MainActivity extends Activity implements BottomNavigationView.OnNavigationItemSelectedListener, LocationTask.AsyncResponse, XMLParsingTask.XMLParsingTaskResponses {
 
     private static final String LOG_TAG = "MainActivity";
     private static final int REQUEST_LOCATION_PERMISSION = 1;
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
     String latitude;
     String longitude;
@@ -69,9 +81,17 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     private ImageView cuacaIcon2;
     private ImageView cuacaIcon1;
 
+    private int cuacaIconId;
+    private int cuacaIcon1Id;
+    private int cuacaIcon2Id;
+
     Location lokasiMain;
     FusedLocationProviderClient fusedLocationProviderClient;
     Geocoder geocoder;
+
+    private SharedPreferences sharedPreferences;
+    private Preferences preferences = new Preferences();
+    private String sharedPrefFile = preferences.SHARED_PRE_FILE;
 
     @SuppressLint({"MissingPermission", "SetTextI18n"})
     @Override
@@ -101,40 +121,80 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
         waktu.setText("Mencari.....");
         waktu1.setText("Mencari.....");
         waktu2.setText("Mencari.....");
+
         locationAccessPermission();
 
 
-
-
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        geocoder = new Geocoder(this, Locale.getDefault());
-        new LocationTask(this,this, geocoder, fusedLocationProviderClient, lokasiMainTextView).execute();
-
         if (savedInstanceState != null){
             lokasiMainTextView.setText(savedInstanceState.getString("Lokasi Terakhir"));
+            waktu.setText(savedInstanceState.getString("waktu"));
+            waktu1.setText(savedInstanceState.getString("waktu1"));
+            waktu2.setText(savedInstanceState.getString("waktu2"));
+            suhu.setText(savedInstanceState.getString("suhu"));
+            suhu1.setText(savedInstanceState.getString("suhu1"));
+            suhu2.setText(savedInstanceState.getString("suhu2"));
+            kelembaban.setText(savedInstanceState.getString("kelembaban"));
+            kelembaban1.setText(savedInstanceState.getString("kelembaban1"));
+            kelembaban2.setText(savedInstanceState.getString("kelembaban2"));
         }
 
     }
 
     @Override
-    public void processFinish(String kabupaten, String provinsi) {
-        String[] kab =kabupaten.split(" ");
-        kabupaten = "";
-        for (int i = 1; i < kab.length ; i++){
-            kabupaten += kab[i];
-            if(i != kab.length -1){
-                kabupaten += " ";
-            }
+    protected void onStart() {
+        super.onStart();
+        sharedPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
+        if (sharedPreferences.getString(preferences.KEY_UUID, null) == null){
+            String uuID = UUID.randomUUID().toString();
+            SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
+            preferencesEditor.putString(preferences.KEY_UUID, uuID);
+            preferencesEditor.putString(preferences.MODEL, Build.MODEL);
+            preferencesEditor.putString(preferences.VERSION_RELEASE, Build.VERSION.RELEASE);
+            preferencesEditor.apply();
         }
-        this.kabupaten = kabupaten;
-        this.provinsi = provinsi;
-        Log.e(LOG_TAG, kabupaten + provinsi);
-        new XMLParsingTask(this ,kabupaten, provinsi).execute();
+        System.out.println(sharedPreferences.getString("key_UUID", "null"));
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+    @Override
+    public void processFinish(String kabupaten, String provinsi) {
+        try{
+            String[] kab = kabupaten.split(" ");
+            kabupaten = "";
+            for (int i = 1; i < kab.length ; i++){
+                kabupaten += kab[i];
+                if(i != kab.length -1){
+                    kabupaten += " ";
+                }
+            }
+            this.kabupaten = kabupaten;
+            this.provinsi = provinsi;
+            Log.e(LOG_TAG, kabupaten + provinsi);
+            new XMLParsingTask(this ,kabupaten, provinsi).execute();
+        }
+        catch (NullPointerException e){
+            System.out.println("GPS dan izin lokasi dibutuhkan");
+        }
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putString("waktu", waktu.getText().toString());
+        outState.putString("waktu1", waktu1.getText().toString());
+        outState.putString("waktu2", waktu2.getText().toString());
+        outState.putString("suhu", suhu.getText().toString());
+        outState.putString("suhu1", suhu1.getText().toString());
+        outState.putString("suhu2", suhu2.getText().toString());
+        outState.putString("kelembaban", kelembaban.getText().toString());
+        outState.putString("kelembaban1", kelembaban1.getText().toString());
+        outState.putString("kelembaban2", kelembaban2.getText().toString());
+        outState.putInt("cuacaIcon", cuacaIconId);
+        outState.putInt("cuacaIcon", cuacaIcon1Id);
+        outState.putInt("cuacaIcon", cuacaIcon2Id);
         outState.putString("Lokasi Terakhir", lokasiMainTextView.getText().toString());
     }
 
@@ -147,17 +207,33 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
                     locationAccessPermission();
                 }
                 else{
-                    Toast.makeText(this, R.string.location_permission_denied,Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Harap Setujui izin permintaan lokasi dan nyalakan GPS", Toast.LENGTH_LONG).show();
                 }
                 break;
         }
     }
 
     private void locationAccessPermission() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+        sharedPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
+        if ((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                + ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                + ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) != PackageManager.PERMISSION_GRANTED
+        && sharedPreferences.getInt("Permisi", 0) != 1){
+            SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
+            preferencesEditor.putInt("Permisi", 1);
+            preferencesEditor.apply();
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 2 );
         }
-        else {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
+            Intent intent = new Intent (Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", getPackageName(),null));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+        else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+            geocoder = new Geocoder(this, Locale.getDefault());
+            new LocationTask(this,this, geocoder, fusedLocationProviderClient, lokasiMainTextView).execute();
             Log.d(LOG_TAG, "Lokasi Permisi Diberikan");
         }
     }
@@ -180,43 +256,6 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
         }
         return false;
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d(LOG_TAG,"On Start");
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d(LOG_TAG,"On ReStart");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG,"On Resume");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(LOG_TAG,"On Pause");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(LOG_TAG,"On Stop");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG,"On Destroy");
-    }
-
 
     @SuppressLint("SetTextI18n")
     @Override
