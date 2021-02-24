@@ -109,7 +109,8 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
     }
 
     private void createDatabase() {
-        gpcDatabase = openOrCreateDatabase();
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+        //TODO DATABASE BELUM
     }
 
     private void startAlarm(Calendar calendar) {
