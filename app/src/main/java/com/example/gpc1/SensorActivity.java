@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -34,10 +35,12 @@ import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class SensorActivity extends Activity implements BottomNavigationView.OnNavigationItemSelectedListener, SensorEventListener, CpuUsageTask.CpuUsageTaskFinish {
     private static final String LOG_TAG = SensorActivity.class.getSimpleName();
     private final int STORAGE_PERMISSION_CODE = 1;
+    SQLiteDatabase gpcDatabase;
 
 
     private SensorManager sensorManager;
@@ -69,7 +72,6 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
 
         requestPermissionStorage();
-        new CpuUsageTask(this).execute();
 
         sharedPreferences = getSharedPreferences(preferences.SHARED_PRE_FILE, MODE_PRIVATE);
         System.out.println(sharedPreferences.getString(preferences.MODEL, null) + sharedPreferences.getString(preferences.VERSION_RELEASE, null));
@@ -93,25 +95,28 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         }
         if(mSuhuCPU == null){
             cpuUsage.setText(NO_SENSOR);
+            new CpuUsageTask(this).execute();
         }
+
         suhuBaterai.setText(batteryReadTemperature(this));
-        System.out.println("Start = =" + key_UUID);
         uuID.setText(key_UUID);
-        System.out.println(LOG_TAG + key_UUID);
 
         Calendar calendar = Calendar.getInstance();
-        System.out.println(LOG_TAG + "=> calendar = " + calendar);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
-        System.out.println(LOG_TAG + "=> calendar = " + calendar);
         startAlarm(calendar);
+        createDatabase();
+    }
+
+    private void createDatabase() {
+        gpcDatabase = openOrCreateDatabase();
     }
 
     private void startAlarm(Calendar calendar) {
         Intent notifyIntent = new Intent(this, MyReceiver.class);
         PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(this, PEREKAMAN_DATA, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + 1000 * 60, 1000*60 ,notifyPendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + 1000 * 60, 2000*60 ,notifyPendingIntent);
     }
 
     private void cancelAlarm(){
@@ -177,6 +182,11 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
     protected void onStart() {
         super.onStart();
         Log.d(LOG_TAG,"On Start");
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSuhuUdara = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+        mSuhuCPU = sensorManager.getDefaultSensor(Sensor.TYPE_TEMPERATURE);
+        mKelembabanUdara  = sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
+        mTekananUdara = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
         if(mTekananUdara != null){
             sensorManager.registerListener(this, mTekananUdara, SensorManager.SENSOR_DELAY_NORMAL);
         }
@@ -250,7 +260,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
                 break;
             case Sensor.TYPE_TEMPERATURE:
                 cpuUsage.setText(String.valueOf(currentValue));
-
+                break;
         }
     }
 

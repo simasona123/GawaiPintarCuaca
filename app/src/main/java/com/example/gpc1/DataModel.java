@@ -1,8 +1,7 @@
 package com.example.gpc1;
 
 public class DataModel {
-    private int id;
-    private long timeStamp;
+    private String timeStamp;
     private double latitude;
     private double longitude;
     private double altitude;
@@ -15,11 +14,10 @@ public class DataModel {
     private boolean statusLayar;
     private boolean statusBaterai;
 
-    public DataModel(int id, long timeStamp, double latitude, double longitude,
+    public DataModel(String timeStamp, double latitude, double longitude,
                      double altitude, float suhuUdara, float kelembabanUdara,
                      float suhuBaterai, float tekananUdara, float cpuTemperatur,
                      boolean dikirim, boolean statusLayar, boolean statusBaterai) {
-        this.id = id;
         this.timeStamp = timeStamp;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -34,10 +32,12 @@ public class DataModel {
         this.statusBaterai = statusBaterai;
     }
 
+    public DataModel() {
+    }
+
     @Override
     public String toString() {
         return "DataModel{" +
-                "id=" + id +
                 ", timeStamp=" + timeStamp +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
@@ -53,19 +53,12 @@ public class DataModel {
                 '}';
     }
 
-    public int getId() {
-        return id;
-    }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public long getTimeStamp() {
+    public String getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(long timeStamp) {
+    public void setTimeStamp(String timeStamp) {
         this.timeStamp = timeStamp;
     }
 

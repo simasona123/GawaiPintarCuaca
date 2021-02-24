@@ -69,7 +69,6 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
                 latitude = String.format("%.4f",location.getLatitude());
                 longitude = String.format("%.4f",location.getLongitude());
                 altitude = String.valueOf(location.getAltitude());
-                System.out.println("Ketinggian = " + altitude);
                 List <Address> addresses = null;
                 String resultMesage = "";
                 try{
@@ -81,18 +80,15 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
                 catch (IOException | NullPointerException e){
                     resultMesage = "Service Not Available";
                     Log.e(TAG, resultMesage, e);
-                    System.out.println(TAG + resultMesage);
                 }
                 catch (IllegalArgumentException illegalArgumentException){
                     resultMesage = "Invalid Coordinates Supplied";
                     Log.e(TAG, resultMesage, illegalArgumentException);
-                    System.out.println(TAG + resultMesage);
                 }
                 if (addresses == null || addresses.size() == 0){
                     if (resultMesage.isEmpty()){
                         resultMesage = "Address Not Found";
                         Log.e(TAG, resultMesage);
-                        System.out.println(TAG + resultMesage);
                         lokasi = resultMesage;
                     }
                 }
@@ -101,13 +97,11 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
                     ArrayList <String> addressParts = new ArrayList<>();
                     for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
                         addressParts.add(address.getAddressLine(i));
-                        System.out.println("Array = " + addressParts.get(i));
                     }
                     resultMesage = TextUtils.join("\n", addressParts);
                     kabupaten = address.getSubAdminArea();
                     provinsi = address.getAdminArea();
                     Log.e(TAG, resultMesage);
-                    System.out.println(TAG + " : " + resultMesage);
                     lokasi = kabupaten + ", " + provinsi;
                 }
             }

@@ -76,18 +76,14 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
             xmlPullParser.nextTag();
             tagName = xmlPullParser.getName();
             tagEventType = xmlPullParser.getEventType();
-            System.out.println(TAG + " "+ tagName + " "+ tagEventType);
             while (xmlPullParser.next()!= xmlPullParser.END_TAG){
                 if (xmlPullParser.getEventType() != xmlPullParser.START_TAG){
                     continue;
                 }
                 tagName = xmlPullParser.getName();
                 tagEventType = xmlPullParser.getEventType();
-                System.out.println("A = " + " "+ tagName + " "+ tagEventType);
                 if (tagName.equals("area")){
                     String description = xmlPullParser.getAttributeValue(null, "description");
-                    System.out.println("Description = " + description);
-                    System.out.println(description.equals(kabupaten));
                     if(description.equals(kabupaten)){
                         while(xmlPullParser.next() != XmlPullParser.END_TAG){
                             if (xmlPullParser.getEventType() != xmlPullParser.START_TAG){
@@ -95,7 +91,6 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
                             }
                             if (xmlPullParser.getName().equals("parameter")){
                                 String id = xmlPullParser.getAttributeValue(null, "id");
-                                System.out.println("ID = " + id);
                                 x = 0;
                                 if (id.equals("hu")){
                                     while(xmlPullParser.next() != xmlPullParser.END_TAG){
@@ -108,20 +103,17 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
                                             assert waktu1 != null;
                                             if (waktu1.after(waktu) && x < 3){
                                                 x = x + 1;
-                                                System.out.println("x = " + x);
                                                 waktuCuaca.add(waktu1);
                                                 while (xmlPullParser.next()!=xmlPullParser.END_TAG){
                                                     if(xmlPullParser.getEventType()!=xmlPullParser.START_TAG){
                                                         tagName = xmlPullParser.getName();
                                                         tagEventType = xmlPullParser.getEventType();
-                                                        System.out.println("V = " + " "+ tagName + " "+ tagEventType);
                                                         continue;
                                                     }
                                                     if (xmlPullParser.getName().equals("value")) {
                                                         if(xmlPullParser.next() == xmlPullParser.TEXT){
                                                             int kelembaban1 = Integer.parseInt(xmlPullParser.getText());
                                                             kelembaban.add(kelembaban1);
-                                                            System.out.println("Kelembaban 1 = " + kelembaban1);
                                                             xmlPullParser.next();xmlPullParser.next();
                                                         }
                                                     }
@@ -147,19 +139,16 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
                                             assert waktu1 != null;
                                             if (waktu1.after(waktu) && x < 3){
                                                 x = x + 1;
-                                                System.out.println("x = " + x);
                                                 while (xmlPullParser.next()!=xmlPullParser.END_TAG){
                                                     if(xmlPullParser.getEventType()!=xmlPullParser.START_TAG){
                                                         tagName = xmlPullParser.getName();
                                                         tagEventType = xmlPullParser.getEventType();
-                                                        System.out.println("V = " + " "+ tagName + " "+ tagEventType);
                                                         continue;
                                                     }
                                                     if (xmlPullParser.getName().equals("value")) {
                                                         if(xmlPullParser.next() == xmlPullParser.TEXT){
                                                             Float suhu1 = Float.parseFloat(xmlPullParser.getText());
                                                             suhu.add(suhu1);
-                                                            System.out.println("suhu 1 = " + suhu1);
                                                             xmlPullParser.next();xmlPullParser.next();
                                                         }
                                                     }
@@ -185,19 +174,16 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
                                             assert waktu1 != null;
                                             if (waktu1.after(waktu) && x < 3){
                                                 x = x + 1;
-                                                System.out.println("x = " + x);
                                                 while (xmlPullParser.next()!=xmlPullParser.END_TAG){
                                                     if(xmlPullParser.getEventType()!=xmlPullParser.START_TAG){
                                                         tagName = xmlPullParser.getName();
                                                         tagEventType = xmlPullParser.getEventType();
-                                                        System.out.println("V = " + " "+ tagName + " "+ tagEventType);
                                                         continue;
                                                     }
                                                     if (xmlPullParser.getName().equals("value")) {
                                                         if(xmlPullParser.next() == xmlPullParser.TEXT){
                                                             int kelembaban1 = Integer.parseInt(xmlPullParser.getText());
                                                             kodeCuaca.add(kelembaban1);
-                                                            System.out.println("kodeCuaca = " + kelembaban1);
                                                             xmlPullParser.next();xmlPullParser.next();
                                                         }
                                                     }

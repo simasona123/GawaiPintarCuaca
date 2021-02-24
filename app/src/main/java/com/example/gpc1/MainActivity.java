@@ -53,37 +53,18 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
-    String latitude;
-    String longitude;
-    String timeStamp;
-    String lokasi;
-    String provinsi;
-    String kabupaten;
+    String latitude, longitude, timeStamp, lokasi, provinsi, kabupaten;
 
     @SuppressLint("SimpleDateFormat")
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy HH:mm");
     @SuppressLint("SimpleDateFormat")
     SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("dd MMMM HH:mm");
 
+    private TextView lokasiMainTextView, waktu, waktu1, waktu2, suhu, suhu1, suhu2, kelembaban, kelembaban1
+            , kelembaban2;
+    private ImageView cuacaIcon, cuacaIcon1, cuacaIcon2;
 
-    private TextView lokasiMainTextView;
-
-    private TextView waktu;
-    private TextView waktu1;
-    private TextView waktu2;
-    private TextView suhu;
-    private TextView suhu1;
-    private TextView suhu2;
-    private TextView kelembaban;
-    private TextView kelembaban1;
-    private TextView kelembaban2;
-    private ImageView cuacaIcon;
-    private ImageView cuacaIcon2;
-    private ImageView cuacaIcon1;
-
-    private int cuacaIconId;
-    private int cuacaIcon1Id;
-    private int cuacaIcon2Id;
+    private int cuacaIconId, cuacaIcon1Id, cuacaIcon2Id;
 
     Location lokasiMain;
     FusedLocationProviderClient fusedLocationProviderClient;
@@ -124,7 +105,6 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
 
         locationAccessPermission();
 
-
         if (savedInstanceState != null){
             lokasiMainTextView.setText(savedInstanceState.getString("Lokasi Terakhir"));
             waktu.setText(savedInstanceState.getString("waktu"));
@@ -137,7 +117,6 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
             kelembaban1.setText(savedInstanceState.getString("kelembaban1"));
             kelembaban2.setText(savedInstanceState.getString("kelembaban2"));
         }
-
     }
 
     @Override
@@ -152,7 +131,6 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
             preferencesEditor.putString(preferences.VERSION_RELEASE, Build.VERSION.RELEASE);
             preferencesEditor.apply();
         }
-        System.out.println(sharedPreferences.getString("key_UUID", "null"));
     }
     @Override
     protected void onResume() {
@@ -260,14 +238,9 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     @SuppressLint("SetTextI18n")
     @Override
     public void processFinish(ArrayList<Integer> kelembabanParsing, ArrayList<Float> suhuParsing, ArrayList<Integer> kodeCuaca, ArrayList<Date> waktuCuaca) {
-        System.out.println(kelembabanParsing);
-        System.out.println(suhuParsing);
-        System.out.println(kodeCuaca);
-        System.out.println(waktuCuaca);
         String waktuText = simpleDateFormat.format(waktuCuaca.get(0));
         String waktu1Text = simpleDateFormat1.format(waktuCuaca.get(1));
         String waktu2Text = simpleDateFormat1.format(waktuCuaca.get(2));
-        System.out.println(waktuText+ " " + waktu1Text + " " + waktu2Text);
         waktu.setText(waktuText);
         waktu1.setText(waktu1Text);
         waktu2.setText(waktu2Text);
