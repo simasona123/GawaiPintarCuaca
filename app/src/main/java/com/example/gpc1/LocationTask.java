@@ -113,7 +113,7 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
             addresses = geocoder.getFromLocation(
                     location1.getLatitude(),
                     location1.getLongitude(),
-                    1);gi
+                    1);
         }
         catch (IOException | NullPointerException e){
             resultMesage = "Service Not Available";
