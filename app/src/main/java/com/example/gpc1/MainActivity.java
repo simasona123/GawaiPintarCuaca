@@ -1,41 +1,30 @@
 package com.example.gpc1;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
-import android.hardware.Sensor;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.tabs.TabLayout;
-
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,10 +37,6 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     private static final String LOG_TAG = "MainActivity";
     private static final int REQUEST_LOCATION_PERMISSION = 1;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
 
     String latitude, longitude, timeStamp, lokasi, provinsi, kabupaten;
 
@@ -60,19 +45,22 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     @SuppressLint("SimpleDateFormat")
     SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("dd MMMM HH:mm");
 
-    private TextView lokasiMainTextView, waktu, waktu1, waktu2, suhu, suhu1, suhu2, kelembaban, kelembaban1
+    private TextView lokasiMainTextView, waktu, waktu1, waktu2, suhu, suhu1, suhu2
+            , kelembaban
+            , kelembaban1
             , kelembaban2;
     private ImageView cuacaIcon, cuacaIcon1, cuacaIcon2;
 
     private int cuacaIconId, cuacaIcon1Id, cuacaIcon2Id;
 
     Location lokasiMain;
+    LocationRequest locationRequest;
     FusedLocationProviderClient fusedLocationProviderClient;
     Geocoder geocoder;
 
     private SharedPreferences sharedPreferences;
     private Preferences preferences = new Preferences();
-    private String sharedPrefFile = preferences.SHARED_PRE_FILE;
+    private final String sharedPrefFile = preferences.SHARED_PRE_FILE;
 
     @SuppressLint({"MissingPermission", "SetTextI18n"})
     @Override
@@ -140,18 +128,10 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     @Override
     public void processFinish(String kabupaten, String provinsi) {
         try{
-            String[] kab = kabupaten.split(" ");
-            kabupaten = "";
-            for (int i = 1; i < kab.length ; i++){
-                kabupaten += kab[i];
-                if(i != kab.length -1){
-                    kabupaten += " ";
-                }
-            }
             this.kabupaten = kabupaten;
             this.provinsi = provinsi;
             Log.e(LOG_TAG, kabupaten + provinsi);
-            new XMLParsingTask(this ,kabupaten, provinsi).execute();
+            new XMLParsingTask(this, kabupaten, provinsi).execute();
         }
         catch (NullPointerException e){
             System.out.println("GPS dan izin lokasi dibutuhkan");
@@ -208,14 +188,20 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
-        else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) { //TODO Location Perbaiki
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+            createLocationRequest();
             geocoder = new Geocoder(this, Locale.getDefault());
             new LocationTask(this,this, geocoder, fusedLocationProviderClient, lokasiMainTextView).execute();
             Log.d(LOG_TAG, "Lokasi Permisi Diberikan");
         }
     }
-
+    private void createLocationRequest (){
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(20 * 1000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -238,21 +224,26 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     @SuppressLint("SetTextI18n")
     @Override
     public void processFinish(ArrayList<Integer> kelembabanParsing, ArrayList<Float> suhuParsing, ArrayList<Integer> kodeCuaca, ArrayList<Date> waktuCuaca) {
-        String waktuText = simpleDateFormat.format(waktuCuaca.get(0));
-        String waktu1Text = simpleDateFormat1.format(waktuCuaca.get(1));
-        String waktu2Text = simpleDateFormat1.format(waktuCuaca.get(2));
-        waktu.setText(waktuText);
-        waktu1.setText(waktu1Text);
-        waktu2.setText(waktu2Text);
-        suhu.setText(suhuParsing.get(0).toString());
-        suhu1.setText(suhuParsing.get(2).toString());
-        suhu2.setText(suhuParsing.get(4).toString());
-        kelembaban.setText(kelembabanParsing.get(0).toString());
-        kelembaban1.setText(kelembabanParsing.get(1).toString());
-        kelembaban2.setText(kelembabanParsing.get(2).toString());
-        gambarCuaca(cuacaIcon, kodeCuaca.get(0));
-        gambarCuaca(cuacaIcon1, kodeCuaca.get(1));
-        gambarCuaca(cuacaIcon2, kodeCuaca.get(2));
+        if(waktuCuaca.size() == 0){
+            Toast.makeText(MainActivity.this, "Tidak dapat menemukan prediksi cuaca", Toast.LENGTH_LONG).show();
+        }
+        else{
+            String waktuText = simpleDateFormat.format(waktuCuaca.get(0));
+            String waktu1Text = simpleDateFormat1.format(waktuCuaca.get(1));
+            String waktu2Text = simpleDateFormat1.format(waktuCuaca.get(2));
+            waktu.setText(waktuText);
+            waktu1.setText(waktu1Text);
+            waktu2.setText(waktu2Text);
+            suhu.setText(suhuParsing.get(0).toString());
+            suhu1.setText(suhuParsing.get(2).toString());
+            suhu2.setText(suhuParsing.get(4).toString());
+            kelembaban.setText(kelembabanParsing.get(0).toString());
+            kelembaban1.setText(kelembabanParsing.get(1).toString());
+            kelembaban2.setText(kelembabanParsing.get(2).toString());
+            gambarCuaca(cuacaIcon, kodeCuaca.get(0));
+            gambarCuaca(cuacaIcon1, kodeCuaca.get(1));
+            gambarCuaca(cuacaIcon2, kodeCuaca.get(2));
+        }
     }
 
     private void gambarCuaca(ImageView cuacaIcon2, Integer integer) {

@@ -1,10 +1,12 @@
 package com.example.gpc1;
 
 public class DataModel {
+    private int id;
     private String timeStamp;
     private double latitude;
     private double longitude;
     private double altitude;
+    private double altitude1; //altitude1 API
     private float suhuUdara;
     private float kelembabanUdara;
     private float suhuBaterai;
@@ -14,14 +16,43 @@ public class DataModel {
     private boolean statusLayar;
     private boolean statusBaterai;
 
+    public double getAltitude1() {
+        return altitude1;
+    }
+
+    public void setAltitude1(double altitude1) {
+        this.altitude1 = altitude1;
+    }
+
     public DataModel(String timeStamp, double latitude, double longitude,
-                     double altitude, float suhuUdara, float kelembabanUdara,
+                     double altitude, double altitude1, float suhuUdara, float kelembabanUdara,
                      float suhuBaterai, float tekananUdara, float cpuTemperatur,
                      boolean dikirim, boolean statusLayar, boolean statusBaterai) {
         this.timeStamp = timeStamp;
         this.latitude = latitude;
         this.longitude = longitude;
         this.altitude = altitude;
+        this.altitude1 = altitude1;
+        this.suhuUdara = suhuUdara;
+        this.kelembabanUdara = kelembabanUdara;
+        this.suhuBaterai = suhuBaterai;
+        this.tekananUdara = tekananUdara;
+        this.cpuTemperatur = cpuTemperatur;
+        this.dikirim = dikirim;
+        this.statusLayar = statusLayar;
+        this.statusBaterai = statusBaterai;
+    }
+
+    public DataModel(int id, String timeStamp, double latitude, double longitude, double altitude,
+                     double altitude1, float suhuUdara, float kelembabanUdara, float suhuBaterai,
+                     float tekananUdara, float cpuTemperatur, boolean dikirim, boolean statusLayar,
+                     boolean statusBaterai) {
+        this.id = id;
+        this.timeStamp = timeStamp;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.altitude = altitude;
+        this.altitude1 = altitude1;
         this.suhuUdara = suhuUdara;
         this.kelembabanUdara = kelembabanUdara;
         this.suhuBaterai = suhuBaterai;
@@ -37,19 +68,19 @@ public class DataModel {
 
     @Override
     public String toString() {
-        return "DataModel{" +
-                ", timeStamp=" + timeStamp +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
-                ", altitude=" + altitude +
-                ", suhuUdara=" + suhuUdara +
-                ", kelembabanUdara=" + kelembabanUdara +
-                ", suhuBaterai=" + suhuBaterai +
-                ", tekananUdara=" + tekananUdara +
-                ", cpuTemperatur=" + cpuTemperatur +
-                ", dikirim=" + dikirim +
-                ", statusLayar=" + statusLayar +
-                ", statusBaterai=" + statusBaterai +
+        return  "id: "+ id +
+                "{ time: "+ timeStamp +
+                ", lat: " + latitude +
+                ", long: " + longitude +
+                ", alt: " + altitude +
+                ", suhu: " + suhuUdara +
+                ", rh: " + kelembabanUdara +
+                ", suhuBat: " + suhuBaterai +
+                ", tekanan: " + tekananUdara +
+                ", suhuCPU: " + cpuTemperatur +
+                ", kirim: " + dikirim +
+                ", layar: " + statusLayar +
+                ", charging: " + statusBaterai +
                 '}';
     }
 

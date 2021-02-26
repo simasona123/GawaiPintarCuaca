@@ -1,16 +1,12 @@
 package com.example.gpc1;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -21,10 +17,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.os.BatteryManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -34,8 +28,8 @@ import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.text.DecimalFormat;
 import java.util.Calendar;
-import java.util.List;
 
 public class SensorActivity extends Activity implements BottomNavigationView.OnNavigationItemSelectedListener, SensorEventListener, CpuUsageTask.CpuUsageTaskFinish {
     private static final String LOG_TAG = SensorActivity.class.getSimpleName();
@@ -109,8 +103,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
     }
 
     private void createDatabase() {
-        DatabaseHelper databaseHelper = new DatabaseHelper(this);
-        //TODO DATABASE BELUM
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);//TODO Cek Koding Database
     }
 
     private void startAlarm(Calendar calendar) {
@@ -118,13 +111,6 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(this, PEREKAMAN_DATA, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + 1000 * 60, 2000*60 ,notifyPendingIntent);
-    }
-
-    private void cancelAlarm(){
-        Intent notifyIntent = new Intent(this, MyReceiver.class);
-        PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(this, PEREKAMAN_DATA, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarmManager.cancel(notifyPendingIntent);
     }
 
     @Override
@@ -153,7 +139,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
     private String batteryReadTemperature(Context context) {
         Intent intent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         float temp = ((float) intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0))/10;
-        return  String.valueOf(temp);
+        return  String.valueOf(new DecimalFormat("##.##").format(temp));
     }
 
     public void bukaLogActivity(View view) {
@@ -251,16 +237,16 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         float currentValue = event.values[0];
         switch (sensorType){
             case Sensor.TYPE_AMBIENT_TEMPERATURE :
-                suhuUdara.setText(String.valueOf(currentValue));
+                suhuUdara.setText(new DecimalFormat("##.##").format(currentValue));
                 break;
             case Sensor.TYPE_RELATIVE_HUMIDITY:
-                kelembabanUdara.setText(String.valueOf(currentValue));
+                kelembabanUdara.setText(new DecimalFormat("###.#").format(currentValue));
                 break;
             case Sensor.TYPE_PRESSURE:
-                tekananUdara.setText(String.valueOf(currentValue));
+                tekananUdara.setText(new DecimalFormat("####.##").format(currentValue));
                 break;
             case Sensor.TYPE_TEMPERATURE:
-                cpuUsage.setText(String.valueOf(currentValue));
+                cpuUsage.setText(new DecimalFormat("##.##").format(currentValue));
                 break;
         }
     }
@@ -272,6 +258,6 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
 
     @Override
     public void processFinish(double cpuTemperature) {
-        cpuUsage.setText(String.valueOf(cpuTemperature));
+        cpuUsage.setText(new DecimalFormat("##.##").format(cpuTemperature));
     }
 }

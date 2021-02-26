@@ -3,10 +3,7 @@ package com.example.gpc1;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.IntentService;
-import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -15,14 +12,18 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.PowerManager;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
+
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -58,11 +59,13 @@ public class IntentServicePerekamanData extends IntentService implements SensorE
     private Sensor mTekananUdara;
     private Sensor mSuhuCPU;
 
+
     Calendar calendar;
     String timeStamp; //Sudah
     private double longitude; //Sudah
     private double latitude; //Sudah
     private double altitude; //Sudah
+    private double altitude1; //Sudah
     private float suhuBaterai; //sudah
     private float suhuUdara = 0; //sudah
     private float tekananUdara = 0; //sudah
@@ -75,6 +78,7 @@ public class IntentServicePerekamanData extends IntentService implements SensorE
     private final String NOTIFICATION_CHANNEL_ID = "gpcNotification";
 
     DataModel dataRekaman = new DataModel();
+    DatabaseHelper databaseHelper = new DatabaseHelper(this);
 
     public IntentServicePerekamanData (){
         super("IntenServicePerekamanData");
@@ -116,83 +120,124 @@ public class IntentServicePerekamanData extends IntentService implements SensorE
         suhuBaterai = readBatteryTemp(this);
 
         FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String bestProvider = String.valueOf(locationManager.getBestProvider(criteria, true)).toString();
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             notificationGPC.deliverNotification("Akses Lokasi Diperlukan Pada Setting Aplikasi");
         }
+
         else{
             fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                @SuppressLint("MissingPermission")
                 @Override
                 public void onSuccess(Location location) {
-                    longitude = location.getLongitude();
-                    latitude = location.getLatitude();
-                    altitude = location.getAltitude();
-                    System.out.println("Perekaman Data = " + longitude + " And "  + latitude);
-                    System.out.println("Ketinggian Altitude = "+ altitude);
-                    if (Double.compare(altitude, Double.parseDouble("0")) == 0){
-                        RequestQueue requestQueue = Volley.newRequestQueue(IntentServicePerekamanData.this);
-                        String url = "api.opentopodata.org/v1/srtm30m?locations=" + latitude + "," + longitude + "&interpolation=cubic";
-                        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,null, new Response.Listener<JSONObject>() {
+                    if(location == null){
+                        longitude = location.getLongitude();
+                        latitude = location.getLatitude();
+                        altitude = location.getAltitude();
+                        System.out.println("Perekaman Data = " + longitude + " And "  + latitude);
+                        System.out.println("Ketinggian Altitude = "+ altitude);
+                    }
+                    else {
+                        locationManager.requestLocationUpdates(bestProvider, 1000, 0, new LocationListener() {
                             @Override
-                            public void onResponse(JSONObject response) {
-                                try {
-                                    JSONArray results = response.getJSONArray("results");
-                                    JSONObject jsonObject = results.getJSONObject(0);
-                                    altitude = jsonObject.getDouble("elevation");
-                                    System.out.println("altitudeAPI = "+ altitude);
-                                    dataRekaman.setAltitude(altitude);
-                                }
-                                catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                    requestQueue.stop();
-                            }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                System.out.println("Error API");
-                                requestQueue.stop();
+                            public void onLocationChanged(@NonNull Location location1) {
+                                locationManager.removeUpdates(this);
+                                latitude = location1.getLatitude();
+                                longitude = location1.getLongitude();
+                                altitude = location1.getAltitude();
                             }
                         });
-                        requestQueue.add(request);
                     }
-                    else{
-                        dataRekaman.setAltitude(altitude);
-                    }
-                    dataRekaman.setLatitude(latitude);
-                    dataRekaman.setLongitude(longitude);
                 }
             });
-            dataRekaman.setSuhuBaterai(suhuBaterai);
-            dikirim = false;
-            dataRekaman.setDikirim(dikirim);
-            PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH){
-                statusLayar = pm.isInteractive();
-            }
-            else{
-                statusLayar = pm.isScreenOn();
-            }
-            dataRekaman.setStatusLayar(statusLayar);
-            int baterai = intent.getIntExtra("statusBaterai", -1);
-            if (baterai == 0){
-                statusBaterai = false;
-            }
-            else{
-                statusBaterai = true;
-            }
-            dataRekaman.setStatusBaterai(statusBaterai);
-            if(mSuhuCPU == null){
-                dataRekaman.setCpuTemperatur((float)getCurrentCPUTemperature());
-            }
-            try {
-                Thread.sleep(1000);
-                notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
-                System.out.println(dataRekaman.toString());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
+        try {
+            System.out.println("Tidur 7 Detik");
+            Thread.sleep(7 * 1000);
+            System.out.println("LocationManager = " + latitude + ", " + longitude + ", "+ altitude);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        RequestQueue requestQueue = Volley.newRequestQueue(IntentServicePerekamanData.this);
+        String url = "https://api.opentopodata.org/v1/srtm30m?locations=" + latitude + "," + longitude + "&interpolation=cubic";
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,null
+                , new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray results = response.getJSONArray("results");
+                    JSONObject jsonObject = results.getJSONObject(0);
+                    altitude1 = jsonObject.getDouble("elevation");
+                    System.out.println("altitudeAPI = "+ altitude1);
+                    dataRekaman.setAltitude1(altitude1);
+                    boolean b = databaseHelper.addData(dataRekaman);
+                }
+                catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                requestQueue.stop();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                dataRekaman.setAltitude1(0);
+                System.out.println("Error API");
+                boolean b = databaseHelper.addData(dataRekaman);
+                requestQueue.stop();
+            }
+        });
+        requestQueue.add(request);
+        dataRekaman.setLongitude(longitude);
+        dataRekaman.setLatitude(latitude);
+        dataRekaman.setAltitude(altitude);
+        dataRekaman.setSuhuBaterai(suhuBaterai);
+        dikirim = false;
+        dataRekaman.setDikirim(dikirim);
+        dataRekaman.setStatusLayar(statusLayar());
+        dataRekaman.setStatusBaterai(statusBaterai(intent));
+        if(mSuhuCPU == null){
+            dataRekaman.setCpuTemperatur((float)getCurrentCPUTemperature());
+        }
+        dataRekaman.setLongitude(longitude);
+        dataRekaman.setLatitude(latitude);
+        dataRekaman.setAltitude(altitude);
+        dataRekaman.setSuhuBaterai(suhuBaterai);
+        dikirim = false;
+        dataRekaman.setDikirim(dikirim);
+        dataRekaman.setStatusLayar(statusLayar());
+        dataRekaman.setStatusBaterai(statusBaterai(intent));
+        if(mSuhuCPU == null){
+            dataRekaman.setCpuTemperatur((float)getCurrentCPUTemperature());
+        }
+        notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
+        System.out.println(dataRekaman.toString());
+    }
+
+    private boolean statusBaterai(Intent intent) {
+        int baterai = intent.getIntExtra("statusBaterai", -1);
+        if (baterai == 0){
+            statusBaterai = false;
+        }
+        else{
+            statusBaterai = true;
+        }
+        return statusBaterai;
+    }
+
+    @SuppressLint("ObsoleteSdkInt")
+    private boolean statusLayar() {
+        PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH){
+            statusLayar = pm.isInteractive();
+        }
+        else{
+            statusLayar = pm.isScreenOn();
+        }
+        return statusLayar;
     }
 
     private float readBatteryTemp (Context context){
@@ -214,14 +259,17 @@ public class IntentServicePerekamanData extends IntentService implements SensorE
         switch (sensorType){
             case Sensor.TYPE_AMBIENT_TEMPERATURE :
                 suhuUdara = currentValue;
+                dataRekaman.setSuhuUdara(suhuUdara);
                 System.out.println("Sensor Suhu Udara = " + suhuUdara);
                 break;
             case Sensor.TYPE_RELATIVE_HUMIDITY:
                 kelembabanUdara = currentValue;
+                dataRekaman.setKelembabanUdara(kelembabanUdara);
                 System.out.println("Sensor Kelembaban = " + suhuUdara);
                 break;
             case Sensor.TYPE_PRESSURE:
                 tekananUdara = currentValue;
+                dataRekaman.setTekananUdara(tekananUdara);
                 System.out.println("Sensor Tekanan udara = " + suhuUdara);
                 break;
             case Sensor.TYPE_TEMPERATURE:

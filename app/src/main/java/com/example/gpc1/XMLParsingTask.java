@@ -6,11 +6,9 @@ import android.util.Xml;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
@@ -21,14 +19,9 @@ import java.util.Date;
 
 public class XMLParsingTask extends AsyncTask <Void, Void, String> {
 
-    private final String TAG = XMLParsingTask.class.getSimpleName();
-    private XmlPullParser xmlPullParser;
-    private InputStream inputStream;
     private URL url;
-    private String tagName;
-    private int tagEventType;
 
-    private final String kabupaten;
+    private String kabupaten;
     private final String provinsi;
     String alamatLinkProvinsi;
     Date waktu;
@@ -58,8 +51,8 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
     @Override
     protected String doInBackground(Void... voids){
         alamatLinkProvinsi = Constants.alamatXml.get(provinsi);
-        System.out.println(alamatLinkProvinsi);
         waktu = Calendar.getInstance().getTime();
+        kabupaten = kabupaten.toLowerCase();
         try {
             url = new URL(alamatLinkProvinsi);
 
@@ -68,14 +61,14 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
             e.printStackTrace();
         }
         try{
-            xmlPullParser = Xml.newPullParser();
+            XmlPullParser xmlPullParser = Xml.newPullParser();
             xmlPullParser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES,true);
             System.out.println("URL = " + url);
             xmlPullParser.setInput(getInputStream(url), "UTF-8");
             xmlPullParser.nextTag();
             xmlPullParser.nextTag();
-            tagName = xmlPullParser.getName();
-            tagEventType = xmlPullParser.getEventType();
+            String tagName = xmlPullParser.getName();
+            int tagEventType = xmlPullParser.getEventType();
             while (xmlPullParser.next()!= xmlPullParser.END_TAG){
                 if (xmlPullParser.getEventType() != xmlPullParser.START_TAG){
                     continue;
@@ -84,7 +77,8 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
                 tagEventType = xmlPullParser.getEventType();
                 if (tagName.equals("area")){
                     String description = xmlPullParser.getAttributeValue(null, "description");
-                    if(description.equals(kabupaten)){
+                    description = description.toLowerCase();
+                    if(kabupaten.contains(description)){
                         while(xmlPullParser.next() != XmlPullParser.END_TAG){
                             if (xmlPullParser.getEventType() != xmlPullParser.START_TAG){
                                 continue;
@@ -104,8 +98,8 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
                                             if (waktu1.after(waktu) && x < 3){
                                                 x = x + 1;
                                                 waktuCuaca.add(waktu1);
-                                                while (xmlPullParser.next()!=xmlPullParser.END_TAG){
-                                                    if(xmlPullParser.getEventType()!=xmlPullParser.START_TAG){
+                                                while (xmlPullParser.next()!= xmlPullParser.END_TAG){
+                                                    if(xmlPullParser.getEventType()!= xmlPullParser.START_TAG){
                                                         tagName = xmlPullParser.getName();
                                                         tagEventType = xmlPullParser.getEventType();
                                                         continue;
@@ -114,16 +108,17 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
                                                         if(xmlPullParser.next() == xmlPullParser.TEXT){
                                                             int kelembaban1 = Integer.parseInt(xmlPullParser.getText());
                                                             kelembaban.add(kelembaban1);
-                                                            xmlPullParser.next();xmlPullParser.next();
+                                                            xmlPullParser.next();
+                                                            xmlPullParser.next();
                                                         }
                                                     }
                                                 }
                                             }
                                         }
-                                        if (xmlPullParser.getEventType()==xmlPullParser.END_TAG){
+                                        if (xmlPullParser.getEventType()== xmlPullParser.END_TAG){
                                             xmlPullParser.next();
                                         }
-                                        if (xmlPullParser.getEventType()==xmlPullParser.START_TAG){
+                                        if (xmlPullParser.getEventType()== xmlPullParser.START_TAG){
                                             skip(xmlPullParser);
                                         }
                                     }
@@ -139,8 +134,8 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
                                             assert waktu1 != null;
                                             if (waktu1.after(waktu) && x < 3){
                                                 x = x + 1;
-                                                while (xmlPullParser.next()!=xmlPullParser.END_TAG){
-                                                    if(xmlPullParser.getEventType()!=xmlPullParser.START_TAG){
+                                                while (xmlPullParser.next()!= xmlPullParser.END_TAG){
+                                                    if(xmlPullParser.getEventType()!= xmlPullParser.START_TAG){
                                                         tagName = xmlPullParser.getName();
                                                         tagEventType = xmlPullParser.getEventType();
                                                         continue;
@@ -149,16 +144,17 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
                                                         if(xmlPullParser.next() == xmlPullParser.TEXT){
                                                             Float suhu1 = Float.parseFloat(xmlPullParser.getText());
                                                             suhu.add(suhu1);
-                                                            xmlPullParser.next();xmlPullParser.next();
+                                                            xmlPullParser.next();
+                                                            xmlPullParser.next();
                                                         }
                                                     }
                                                 }
                                             }
                                         }
-                                        if (xmlPullParser.getEventType()==xmlPullParser.END_TAG){
+                                        if (xmlPullParser.getEventType()== xmlPullParser.END_TAG){
                                             xmlPullParser.next();
                                         }
-                                        if (xmlPullParser.getEventType()==xmlPullParser.START_TAG){
+                                        if (xmlPullParser.getEventType()== xmlPullParser.START_TAG){
                                             skip(xmlPullParser);
                                         }
                                     }
@@ -174,8 +170,8 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
                                             assert waktu1 != null;
                                             if (waktu1.after(waktu) && x < 3){
                                                 x = x + 1;
-                                                while (xmlPullParser.next()!=xmlPullParser.END_TAG){
-                                                    if(xmlPullParser.getEventType()!=xmlPullParser.START_TAG){
+                                                while (xmlPullParser.next()!= xmlPullParser.END_TAG){
+                                                    if(xmlPullParser.getEventType()!= xmlPullParser.START_TAG){
                                                         tagName = xmlPullParser.getName();
                                                         tagEventType = xmlPullParser.getEventType();
                                                         continue;
@@ -184,34 +180,35 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
                                                         if(xmlPullParser.next() == xmlPullParser.TEXT){
                                                             int kelembaban1 = Integer.parseInt(xmlPullParser.getText());
                                                             kodeCuaca.add(kelembaban1);
-                                                            xmlPullParser.next();xmlPullParser.next();
+                                                            xmlPullParser.next();
+                                                            xmlPullParser.next();
                                                         }
                                                     }
                                                 }
                                             }
                                         }
-                                        if (xmlPullParser.getEventType()==xmlPullParser.END_TAG){
+                                        if (xmlPullParser.getEventType()== xmlPullParser.END_TAG){
                                             xmlPullParser.next();
                                         }
-                                        if (xmlPullParser.getEventType()==xmlPullParser.START_TAG){
+                                        if (xmlPullParser.getEventType()== xmlPullParser.START_TAG){
                                             skip(xmlPullParser);
                                         }
                                     }
                                 }
                             }
-                            if (xmlPullParser.getEventType()==xmlPullParser.END_TAG){
+                            if (xmlPullParser.getEventType()== xmlPullParser.END_TAG){
                                 xmlPullParser.next();
                             }
-                            if (xmlPullParser.getEventType()==xmlPullParser.START_TAG){
+                            if (xmlPullParser.getEventType()== xmlPullParser.START_TAG){
                                 skip(xmlPullParser);
                             }
                         }
                     }
                 }
-                if (xmlPullParser.getEventType()==xmlPullParser.END_TAG){
+                if (xmlPullParser.getEventType()== xmlPullParser.END_TAG){
                     xmlPullParser.next();
                 }
-                if (xmlPullParser.getEventType()==xmlPullParser.START_TAG){
+                if (xmlPullParser.getEventType()== xmlPullParser.START_TAG){
                     skip(xmlPullParser);
                 }
             }

@@ -165,10 +165,11 @@
                         android:layout_height="wrap_content"
                         android:text="Suhu Udara" />
 
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
+                        android:orientation="horizontal"
                         android:gravity="center">
 
                         <TextView
@@ -182,10 +183,8 @@
                             style="@style/Text.Sensor"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="25dp"
-                            android:paddingLeft="8dp"
                             android:text="&#xb0;C" />
-                    </RelativeLayout>
+                    </LinearLayout>
                 </LinearLayout>
 
                 <!-- rtCpu -->
@@ -203,12 +202,13 @@
                         android:layout_height="wrap_content"
                         android:text="Suhu CPU" />
 
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:gravity="center"
+                        android:orientation="horizontal"
                         android:paddingTop="5dp"
+                        android:gravity="center"
                         android:paddingBottom="5dp">
 
                         <TextView
@@ -222,10 +222,8 @@
                             style="@style/Text.Sensor"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="25dp"
-                            android:paddingLeft="8dp"
                             android:text="&#xb0;C" />
-                    </RelativeLayout>
+                    </LinearLayout>
                 </LinearLayout>
 
             </LinearLayout>

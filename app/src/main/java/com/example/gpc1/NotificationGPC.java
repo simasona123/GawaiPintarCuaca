@@ -16,8 +16,8 @@ import static androidx.core.content.ContextCompat.getSystemService;
 
 public class NotificationGPC {
 
-    private Context context;
-    private NotificationManager notificationManager;
+    private final Context context;
+    private final NotificationManager notificationManager;
     private final String NOTIFICATION_CHANNEL_ID = "gpcNotification";
     private final int NOTIFICATION_ID = 0;
 
@@ -38,7 +38,7 @@ public class NotificationGPC {
     }
 
     private NotificationCompat.Builder getNotificationBuilder (String contentText){
-        Intent notificationIntent = new Intent(context, SensorActivity.class);
+        Intent notificationIntent = new Intent(context, LogActivity.class);
         PendingIntent notificationPendingIntent = PendingIntent.getActivity(context, NOTIFICATION_ID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         return new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle("GPC").setContentText(contentText).setSmallIcon(R.drawable.ic_notif)
@@ -46,10 +46,11 @@ public class NotificationGPC {
                 .setPriority(NotificationCompat.PRIORITY_LOW);
     }
     public Notification notification (Context context, String contentText){
+        Notification notification;
         createNotificationChannel();
-        Intent notificationIntent = new Intent(context, SensorActivity.class);
+        Intent notificationIntent = new Intent(context, LogActivity.class);
         PendingIntent notificationPendingIntent = PendingIntent.getActivity(context, NOTIFICATION_ID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Notification notification = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+        notification = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle("GPC").setContentText(contentText).setSmallIcon(R.drawable.ic_notif)
                 .setContentIntent(notificationPendingIntent).setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW).build();
@@ -59,8 +60,5 @@ public class NotificationGPC {
         createNotificationChannel();
         NotificationCompat.Builder builder = getNotificationBuilder(contextText);
         notificationManager.notify(NOTIFICATION_ID, builder.build());
-    }
-    public void cancelNotification (){
-        notificationManager.cancelAll();
     }
 }

@@ -90,8 +90,11 @@ public class CpuUsageTask extends AsyncTask <Void, Void, Double> {
             if (suhuAnggota > 10000){
                 suhuAnggota = suhuAnggota/1000;
             }
-            if (suhuAnggota > 100){
-                suhuAnggota = suhuAnggota/100;
+            else if (suhuAnggota > 1000){
+                suhuAnggota = suhuAnggota /100;
+            }
+            else if (suhuAnggota > 100){
+                suhuAnggota = suhuAnggota/10;
             }
                 temp = temp + suhuAnggota;
         }
