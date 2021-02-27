@@ -34,7 +34,7 @@ public class MyReceiver extends BroadcastReceiver{
     private void startAlarm(Context context) {
         Calendar calendar = Calendar.getInstance();
         milis = calendar.getTimeInMillis();
-        x = milis % (1000*60*5);
+        x = milis % (1000*60*60);
         Intent notifyIntent = new Intent(context, MyReceiver.class);
         PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

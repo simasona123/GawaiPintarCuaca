@@ -98,7 +98,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
 
         Calendar calendar = Calendar.getInstance();
         milis = calendar.getTimeInMillis();
-        x = milis % (60*1000*5);
+        x = milis % (60*1000*60);
         startAlarm(this, calendar);
         createDatabase();
     }
