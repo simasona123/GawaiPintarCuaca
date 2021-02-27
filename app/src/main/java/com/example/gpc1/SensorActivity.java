@@ -35,7 +35,8 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
     private static final String LOG_TAG = SensorActivity.class.getSimpleName();
     private final int STORAGE_PERMISSION_CODE = 1;
     SQLiteDatabase gpcDatabase;
-
+    long milis;
+    long x;
 
     private SensorManager sensorManager;
     private Sensor mSuhuUdara;
@@ -96,21 +97,21 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         uuID.setText(key_UUID);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        startAlarm(calendar);
+        milis = calendar.getTimeInMillis();
+        x = milis % (60*1000*5);
+        startAlarm(this, calendar);
         createDatabase();
     }
 
     private void createDatabase() {
-        DatabaseHelper databaseHelper = new DatabaseHelper(this);//TODO Cek Koding Database
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
     }
 
-    private void startAlarm(Calendar calendar) {
+    private void startAlarm(Context context, Calendar calendar) {
         Intent notifyIntent = new Intent(this, MyReceiver.class);
-        PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(this, PEREKAMAN_DATA, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + 1000 * 60, 2000*60 ,notifyPendingIntent);
+        PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(context, PEREKAMAN_DATA, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + (1000*60*60 - x), notifyPendingIntent);
     }
 
     @Override

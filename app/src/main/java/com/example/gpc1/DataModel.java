@@ -73,6 +73,7 @@ public class DataModel {
                 ", lat: " + latitude +
                 ", long: " + longitude +
                 ", alt: " + altitude +
+                ", alt1: " + altitude1 +
                 ", suhu: " + suhuUdara +
                 ", rh: " + kelembabanUdara +
                 ", suhuBat: " + suhuBaterai +

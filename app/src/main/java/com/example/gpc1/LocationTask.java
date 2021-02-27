@@ -156,3 +156,5 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
         listener.processFinish(kabupaten, provinsi);
     }
 }
+//TODO Tes di API HP gagah
+//TODO beberapa description kabupaten di prediksi cuaca ngaco
