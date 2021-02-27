@@ -162,6 +162,17 @@ public class IntentServicePerekamanData extends IntentService implements SensorE
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        dataRekaman.setLongitude(longitude);
+        dataRekaman.setLatitude(latitude);
+        dataRekaman.setAltitude(altitude);
+        dataRekaman.setSuhuBaterai(suhuBaterai);
+        dikirim = false;
+        dataRekaman.setDikirim(dikirim);
+        dataRekaman.setStatusLayar(statusLayar());
+        dataRekaman.setStatusBaterai(statusBaterai(intent));
+        if(mSuhuCPU == null){
+            dataRekaman.setCpuTemperatur((float)getCurrentCPUTemperature());
+        }
         RequestQueue requestQueue = Volley.newRequestQueue(IntentServicePerekamanData.this);
         String url = "https://api.opentopodata.org/v1/srtm30m?locations=" + latitude + "," + longitude + "&interpolation=cubic";
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,null
@@ -174,7 +185,9 @@ public class IntentServicePerekamanData extends IntentService implements SensorE
                     altitude1 = jsonObject.getDouble("elevation");
                     System.out.println("altitudeAPI = "+ altitude1);
                     dataRekaman.setAltitude1(altitude1);
-                    boolean b = databaseHelper.addData(dataRekaman);
+                    databaseHelper.addData(dataRekaman);
+                    notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
+                    System.out.println(dataRekaman.toString());
                 }
                 catch (JSONException e) {
                     e.printStackTrace();
@@ -185,36 +198,14 @@ public class IntentServicePerekamanData extends IntentService implements SensorE
             @Override
             public void onErrorResponse(VolleyError error) {
                 dataRekaman.setAltitude1(0);
-                System.out.println("Error API");
-                boolean b = databaseHelper.addData(dataRekaman);
                 requestQueue.stop();
+                System.out.println("Error API");
+                databaseHelper.addData(dataRekaman);
+                notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
+                System.out.println(dataRekaman.toString());
             }
         });
         requestQueue.add(request);
-        dataRekaman.setLongitude(longitude);
-        dataRekaman.setLatitude(latitude);
-        dataRekaman.setAltitude(altitude);
-        dataRekaman.setSuhuBaterai(suhuBaterai);
-        dikirim = false;
-        dataRekaman.setDikirim(dikirim);
-        dataRekaman.setStatusLayar(statusLayar());
-        dataRekaman.setStatusBaterai(statusBaterai(intent));
-        if(mSuhuCPU == null){
-            dataRekaman.setCpuTemperatur((float)getCurrentCPUTemperature());
-        }
-        dataRekaman.setLongitude(longitude);
-        dataRekaman.setLatitude(latitude);
-        dataRekaman.setAltitude(altitude);
-        dataRekaman.setSuhuBaterai(suhuBaterai);
-        dikirim = false;
-        dataRekaman.setDikirim(dikirim);
-        dataRekaman.setStatusLayar(statusLayar());
-        dataRekaman.setStatusBaterai(statusBaterai(intent));
-        if(mSuhuCPU == null){
-            dataRekaman.setCpuTemperatur((float)getCurrentCPUTemperature());
-        }
-        notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
-        System.out.println(dataRekaman.toString());
     }
 
     private boolean statusBaterai(Intent intent) {
