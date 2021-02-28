@@ -4,6 +4,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -18,6 +20,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.IBinder;
 import android.os.PowerManager;
 
 import androidx.annotation.NonNull;
@@ -32,8 +35,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnTokenCanceledListener;
+import com.google.android.gms.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,7 +54,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class IntentServicePerekamanData extends IntentService implements SensorEventListener {
+public class IntentServicePerekamanData extends Service implements SensorEventListener {
     NotificationManager notificationManager;
     NotificationGPC notificationGPC;
     private final int NOTIFICATION_ID = 0;
@@ -58,6 +66,7 @@ public class IntentServicePerekamanData extends IntentService implements SensorE
     private Sensor mKelembabanUdara;
     private Sensor mTekananUdara;
     private Sensor mSuhuCPU;
+    private Intent intent;
 
 
     Calendar calendar;
@@ -80,20 +89,23 @@ public class IntentServicePerekamanData extends IntentService implements SensorE
     DataModel dataRekaman = new DataModel();
     DatabaseHelper databaseHelper = new DatabaseHelper(this);
 
-    public IntentServicePerekamanData (){
-        super("IntenServicePerekamanData");
+    ListenerLocation listenerLocation = new ListenerLocation();
+
+    public IntentServicePerekamanData() {
     }
 
     @Override
-    public void onStart(@Nullable Intent intent, int startId) {
-        super.onStart(intent, startId);
+    public int onStartCommand(Intent intent, int flags, int startId) {
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationGPC = new NotificationGPC(this, notificationManager);
         startForeground(1, notificationGPC.notification(this, "Memulai Perekaman Data"));
+        this.intent = intent;
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
+    public void onCreate() {
+        super.onCreate();
         String contextNotification;
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSuhuUdara = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
@@ -118,104 +130,20 @@ public class IntentServicePerekamanData extends IntentService implements SensorE
         System.out.println("Calendar = " + timeStamp);
         dataRekaman.setTimeStamp(timeStamp);
         suhuBaterai = readBatteryTemp(this);
-
         FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        String bestProvider = String.valueOf(locationManager.getBestProvider(criteria, true)).toString();
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            System.out.println("Izin Lokasi Bom");
             notificationGPC.deliverNotification("Akses Lokasi Diperlukan Pada Setting Aplikasi");
         }
-
         else{
-            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-                @SuppressLint("MissingPermission")
-                @Override
-                public void onSuccess(Location location) {
-                    if(location == null){
-                        longitude = location.getLongitude();
-                        latitude = location.getLatitude();
-                        altitude = location.getAltitude();
-                        System.out.println("Perekaman Data = " + longitude + " And "  + latitude);
-                        System.out.println("Ketinggian Altitude = "+ altitude);
-                    }
-                    else {
-                        locationManager.requestLocationUpdates(bestProvider, 1000, 0, new LocationListener() {
-                            @Override
-                            public void onLocationChanged(@NonNull Location location1) {
-                                locationManager.removeUpdates(this);
-                                latitude = location1.getLatitude();
-                                longitude = location1.getLongitude();
-                                altitude = location1.getAltitude();
-                            }
-                        });
-                    }
-                }
-            });
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(listenerLocation);
         }
-        try {
-            System.out.println("Tidur 7 Detik");
-            Thread.sleep(7 * 1000);
-            System.out.println("LocationManager = " + latitude + ", " + longitude + ", "+ altitude);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        dataRekaman.setLongitude(longitude);
-        dataRekaman.setLatitude(latitude);
-        dataRekaman.setAltitude(altitude);
-        dataRekaman.setSuhuBaterai(suhuBaterai);
-        dikirim = false;
-        dataRekaman.setDikirim(dikirim);
-        dataRekaman.setStatusLayar(statusLayar());
-        dataRekaman.setStatusBaterai(statusBaterai(intent));
-        if(mSuhuCPU == null){
-            dataRekaman.setCpuTemperatur((float)getCurrentCPUTemperature());
-        }
-        RequestQueue requestQueue = Volley.newRequestQueue(IntentServicePerekamanData.this);
-        String url = "https://api.opentopodata.org/v1/srtm30m?locations=" + latitude + "," + longitude + "&interpolation=cubic";
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,null
-                , new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray results = response.getJSONArray("results");
-                    JSONObject jsonObject = results.getJSONObject(0);
-                    altitude1 = jsonObject.getDouble("elevation");
-                    System.out.println("altitudeAPI = "+ altitude1);
-                    dataRekaman.setAltitude1(altitude1);
-                    databaseHelper.addData(dataRekaman);
-                    notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
-                    System.out.println(dataRekaman.toString());
-                }
-                catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                requestQueue.stop();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                dataRekaman.setAltitude1(0);
-                requestQueue.stop();
-                System.out.println("Error API");
-                databaseHelper.addData(dataRekaman);
-                notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
-                System.out.println(dataRekaman.toString());
-            }
-        });
-        requestQueue.add(request);
     }
 
     private boolean statusBaterai(Intent intent) {
         int baterai = intent.getIntExtra("statusBaterai", -1);
-        if (baterai == 0){
-            statusBaterai = false;
-        }
-        else{
-            statusBaterai = true;
-        }
+        statusBaterai = baterai != 0;
         return statusBaterai;
     }
 
@@ -233,14 +161,14 @@ public class IntentServicePerekamanData extends IntentService implements SensorE
 
     private float readBatteryTemp (Context context){
         Intent intent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        float temp = ((float) intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0))/10;
-        return  temp;
+        float temp = ((float) intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0)) / 10;
+        return temp;
     }
 
+    @Nullable
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        sensorManager.unregisterListener(this);
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     @Override
@@ -275,6 +203,7 @@ public class IntentServicePerekamanData extends IntentService implements SensorE
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
+
     private double getCurrentCPUTemperature() {
         String [] dirs = {"sys/devices/system/cpu/cpu0/cpufreq/cpu_temp",
                 "sys/devices/system/cpu/cpu0/cpufreq/FakeShmoo_cpu_temp",
@@ -299,16 +228,12 @@ public class IntentServicePerekamanData extends IntentService implements SensorE
                 "/sys/devices/system/cpu/cpu0/cpufreq/cpu_temp",
         };
         ArrayList<Double> suhu = new ArrayList<>();
-        Process process;
-        String line;
-        BufferedReader reader;
-        RandomAccessFile reader1;
         for (String dir : dirs) {
             try {
                 Double val = OneLineReader.getValue(dir);
                 suhu.add(val);
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("File Not Found");
             }
         }
         double temp = 0.0;
@@ -325,5 +250,99 @@ public class IntentServicePerekamanData extends IntentService implements SensorE
         temp = temp / suhu.size();
         System.out.println("Suhu = " + suhu);
         return temp;
+    }
+
+    private class ListenerLocation implements OnSuccessListener<Location> {
+        @Override
+        public void onSuccess(Location location) {
+            retrieveLocation(location);
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void retrieveLocation(Location location) {
+        if(location == null){
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+            altitude = location.getAltitude();
+            System.out.println("Perekaman Data = " + longitude + " And "  + latitude);
+            System.out.println("Ketinggian Altitude = "+ altitude);
+        }
+        else {
+            FusedLocationProviderClient fusedLocationProviderClient1 = LocationServices.getFusedLocationProviderClient(this);
+            CancellationToken cancellationToken = new CancellationToken() {
+                @Override
+                public boolean isCancellationRequested() {
+                    System.out.println("Ini");
+                    return false;
+                }
+
+                @NonNull
+                @Override
+                public CancellationToken onCanceledRequested(@NonNull OnTokenCanceledListener onTokenCanceledListener) {
+                    return null;
+                }
+            };
+            fusedLocationProviderClient1.getCurrentLocation(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY, cancellationToken).addOnSuccessListener(new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location3) {
+                    updateLocation(location3);
+                }
+            });
+        }
+    }
+
+    private void updateLocation(Location location) {
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        altitude = location.getAltitude();
+        dataRekaman.setLongitude(longitude);
+        dataRekaman.setLatitude(latitude);
+        dataRekaman.setAltitude(altitude);
+        dataRekaman.setSuhuBaterai(suhuBaterai);
+        dikirim = false;
+        dataRekaman.setDikirim(dikirim);
+        dataRekaman.setStatusLayar(statusLayar());
+        dataRekaman.setStatusBaterai(statusBaterai(intent));
+        if(mSuhuCPU == null){
+            dataRekaman.setCpuTemperatur((float)getCurrentCPUTemperature());
+        }
+        System.out.println("LocationManager = " + latitude + ", " + longitude + ", "+ altitude);
+        RequestQueue requestQueue = Volley.newRequestQueue(IntentServicePerekamanData.this);
+        String url = "https://api.opentopodata.org/v1/srtm30m?locations=" + latitude + "," + longitude + "&interpolation=cubic";
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,null
+                , new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray results = response.getJSONArray("results");
+                    JSONObject jsonObject = results.getJSONObject(0);
+                    altitude1 = jsonObject.getDouble("elevation");
+                    System.out.println("altitudeAPI = "+ altitude1);
+                    dataRekaman.setAltitude1(altitude1);
+                    databaseHelper.addData(dataRekaman);
+                    notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
+                    System.out.println(dataRekaman.toString());
+                    stopService(intent);
+                }
+                catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                requestQueue.stop();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                dataRekaman.setAltitude1(0);
+                requestQueue.stop();
+                System.out.println("Error API");
+                databaseHelper.addData(dataRekaman);
+                notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
+                System.out.println(dataRekaman.toString());
+                stopService(intent);
+            }
+        });
+        requestQueue.add(request);
+        sensorManager.unregisterListener(IntentServicePerekamanData.this);
     }
 }

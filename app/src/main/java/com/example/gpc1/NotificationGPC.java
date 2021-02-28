@@ -53,7 +53,7 @@ public class NotificationGPC {
         notification = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle("GPC").setContentText(contentText).setSmallIcon(R.drawable.ic_notif)
                 .setContentIntent(notificationPendingIntent).setAutoCancel(true)
-                .setPriority(NotificationCompat.PRIORITY_LOW).build();
+                .setPriority(NotificationCompat.PRIORITY_MAX).build();
         return notification;
     }
     public void deliverNotification (String contextText){

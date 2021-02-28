@@ -98,7 +98,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
 
         Calendar calendar = Calendar.getInstance();
         milis = calendar.getTimeInMillis();
-        x = milis % (60*1000*60);
+        x = milis % (60*1000*3);
         startAlarm(this, calendar);
         createDatabase();
     }
@@ -111,7 +111,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         Intent notifyIntent = new Intent(this, MyReceiver.class);
         PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(context, PEREKAMAN_DATA, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + (1000*60*60 - x), notifyPendingIntent);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + (1000*60*3 - x), notifyPendingIntent);
     }
 
     @Override
