@@ -6,11 +6,13 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,9 +38,8 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
 
     private static final String LOG_TAG = "MainActivity";
     private static final int REQUEST_LOCATION_PERMISSION = 1;
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
 
-    String latitude, longitude, timeStamp, lokasi, provinsi, kabupaten;
+    String provinsi, kabupaten;
 
     @SuppressLint("SimpleDateFormat")
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy HH:mm");
@@ -53,10 +54,10 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
 
     private int cuacaIconId, cuacaIcon1Id, cuacaIcon2Id;
 
-    Location lokasiMain;
     LocationRequest locationRequest;
     FusedLocationProviderClient fusedLocationProviderClient;
     Geocoder geocoder;
+    String lokasi;
 
     private SharedPreferences sharedPreferences;
     private Preferences preferences = new Preferences();
@@ -126,15 +127,22 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
 
     }
     @Override
-    public void processFinish(String kabupaten, String provinsi) {
+    public void processFinish(String kabupaten, String provinsi, String lokasi) {
         try{
             this.kabupaten = kabupaten;
             this.provinsi = provinsi;
-            Log.e(LOG_TAG, kabupaten + provinsi);
-            new XMLParsingTask(this, kabupaten, provinsi).execute();
+            this.lokasi = lokasi;
+            lokasiMainTextView.setText(lokasi);
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            if(cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected()){
+                new XMLParsingTask(this, kabupaten, provinsi).execute();
+            }
+            else{
+                Toast.makeText(this, "Butuh Koneksi Internet", Toast.LENGTH_SHORT).show();
+            }
         }
         catch (NullPointerException e){
-            System.out.println("GPS dan izin lokasi dibutuhkan");
+            Toast.makeText(this, "GPS dan izin lokasi dibutuhkan", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -188,12 +196,11 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
-        else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) { //TODO Location Perbaiki
+        else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
             createLocationRequest();
             geocoder = new Geocoder(this, Locale.getDefault());
             new LocationTask(this,this, geocoder, fusedLocationProviderClient, lokasiMainTextView).execute();
-            Log.d(LOG_TAG, "Lokasi Permisi Diberikan");
         }
     }
     private void createLocationRequest (){
@@ -203,29 +210,23 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    @SuppressLint("NonConstantResourceId")
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.page_1:
-                return true;
-            case R.id.page_2:
-                Intent intent1 = new Intent (this, SensorActivity.class);
-                startActivity(intent1);
-                break;
-            case R.id.page_3:
-                Intent intent2 = new Intent (this, AboutUs.class);
-                startActivity(intent2);
-                break;
-        }
-        return false;
-    }
-
     @SuppressLint("SetTextI18n")
     @Override
-    public void processFinish(ArrayList<Integer> kelembabanParsing, ArrayList<Float> suhuParsing, ArrayList<Integer> kodeCuaca, ArrayList<Date> waktuCuaca) {
+    public void processFinish(ArrayList<Integer> kelembabanParsing, ArrayList<Float> suhuParsing, ArrayList<Integer> kodeCuaca, ArrayList<Date> waktuCuaca, String s) {
         if(waktuCuaca.size() == 0){
-            Toast.makeText(MainActivity.this, "Tidak dapat menemukan prediksi cuaca", Toast.LENGTH_LONG).show();
+            waktu.setText("Tidak dapat menemukan prediksi cuaca");
+            waktu1.setText("Tidak dapat" +"\n" + "menemukan" +"\n" + "prediksi cuaca");
+            waktu2.setText("Tidak dapat" +"\n" + "menemukan" + "\n" + "prediksi cuaca");
+            suhu.setText("-");
+            suhu1.setText("-");
+            suhu2.setText("-");
+            kelembaban.setText("-");
+            kelembaban1.setText("-");
+            kelembaban2.setText("-");
+
+        }
+        if(s.equals("Tidak ada Lokasi")){
+            lokasiMainTextView.setText(lokasi);
         }
         else{
             String waktuText = simpleDateFormat.format(waktuCuaca.get(0));
@@ -240,9 +241,12 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
             kelembaban.setText(kelembabanParsing.get(0).toString());
             kelembaban1.setText(kelembabanParsing.get(1).toString());
             kelembaban2.setText(kelembabanParsing.get(2).toString());
-            gambarCuaca(cuacaIcon, kodeCuaca.get(0));
-            gambarCuaca(cuacaIcon1, kodeCuaca.get(1));
-            gambarCuaca(cuacaIcon2, kodeCuaca.get(2));
+            cuacaIconId =  kodeCuaca.get(0);
+            cuacaIcon1Id = kodeCuaca.get(1);
+            cuacaIcon2Id = kodeCuaca.get(2);
+            gambarCuaca(cuacaIcon, cuacaIconId);
+            gambarCuaca(cuacaIcon1, cuacaIcon1Id);
+            gambarCuaca(cuacaIcon2, cuacaIcon2Id);
         }
     }
 
@@ -277,6 +281,24 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
                 break;
         }
 
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.page_1:
+                return true;
+            case R.id.page_2:
+                Intent intent1 = new Intent (this, SensorActivity.class);
+                startActivity(intent1);
+                break;
+            case R.id.page_3:
+                Intent intent2 = new Intent (this, AboutUs.class);
+                startActivity(intent2);
+                break;
+        }
+        return false;
     }
 
 }

@@ -39,7 +39,7 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
     XMLParsingTaskResponses listener = null;
 
     public interface XMLParsingTaskResponses {
-        void processFinish (ArrayList <Integer> kelembaban, ArrayList<Float> suhu, ArrayList<Integer> kodeCuaca, ArrayList<Date> waktucuaca);
+        void processFinish (ArrayList <Integer> kelembaban, ArrayList<Float> suhu, ArrayList<Integer> kodeCuaca, ArrayList<Date> waktucuaca,String s);
     }
 
     public XMLParsingTask(XMLParsingTaskResponses listener, String kabupaten1, String provinsi1) {
@@ -52,7 +52,12 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
     protected String doInBackground(Void... voids){
         alamatLinkProvinsi = Constants.alamatXml.get(provinsi);
         waktu = Calendar.getInstance().getTime();
-        kabupaten = kabupaten.toLowerCase();
+        if (kabupaten == null){
+            return "Tidak ada Lokasi";
+        }
+        else{
+            kabupaten = kabupaten.toLowerCase();
+        }
         try {
             url = new URL(alamatLinkProvinsi);
 
@@ -222,7 +227,7 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        listener.processFinish(kelembaban,suhu,kodeCuaca,waktuCuaca);
+        listener.processFinish(kelembaban, suhu, kodeCuaca, waktuCuaca, s);
     }
 
     private void skip (XmlPullParser xmlPullParser) throws XmlPullParserException, IOException{

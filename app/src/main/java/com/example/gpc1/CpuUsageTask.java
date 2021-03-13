@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import static androidx.core.app.ActivityCompat.requestPermissions;
 
@@ -29,7 +30,6 @@ public class CpuUsageTask extends AsyncTask <Void, Void, Double> {
     CpuUsageTaskFinish listener;
     private final WeakReference<Context> context;
     private OneLineReader oneLineReader;
-
     public interface CpuUsageTaskFinish{
         void processFinish(double cpuTemperature);
     }
@@ -49,39 +49,25 @@ public class CpuUsageTask extends AsyncTask <Void, Void, Double> {
     }
 
     private double getCurrentCPUTemperature() {
-        String [] dirs = {"sys/devices/system/cpu/cpu0/cpufreq/cpu_temp",
-                "sys/devices/system/cpu/cpu0/cpufreq/FakeShmoo_cpu_temp",
-                "sys/class/thermal/thermal_zone1/temp",
-                "sys/class/thermal/thermal_zone0/temp",
-                "sys/class/thermal/thermal_zone2/temp",
-                "sys/class/thermal/thermal_zone3/temp",
-                "/sys/devices/virtual/thermal/thermal_zone0/temp",
-                "sys/class/i2c-adapter/i2c-4/4-004c/temperature",
-                "sys/devices/platform/tegra-i2c.3/i2c-4/4-004c/temperature",
-                "sys/devices/platform/omap/omap_temp_sensor.0/temperature",
-                "sys/devices/platform/tegra_tmon/temp1_input",
-                "sys/kernel/debug/tegra_thermal/temp_tj",
-                "sys/devices/platform/s5p-tmu/temperature",
-                "sys/devices/virtual/thermal/thermal_zone0/temp",
-                "sys/devices/virtual/thermal/thermal_zone1/temp",
-                "sys/devices/virtual/thermal/thermal_zone2/temp",
-                "sys/devices/virtual/thermal/thermal_zone3/temp",
-                "sys/class/hwmon/hwmon0/device/temp1_input",
-                "sys/class/hwmon/hwmonX/temp1_input",
-                "sys/devices/platform/s5p-tmu/curr_temp",
-                "/sys/devices/system/cpu/cpu0/cpufreq/cpu_temp",
-        };
+        String [] dirs = {"sys/class/thermal/thermal_zone",
+                        };
         ArrayList <Double> suhu = new ArrayList<>();
-        Process process;
-        String line;
-        BufferedReader reader;
-        RandomAccessFile reader1;
         for (String dir : dirs) {
-            try {
-                Double val = OneLineReader.getValue(dir);
-                suhu.add(val);
-            } catch (Exception e) {
-                e.printStackTrace();
+            for(int i = 0 ; i <= 90 ;i ++){
+                try {
+                    Double val = OneLineReader.getValue(dir + i  +"/temp");
+                    File file = new File (dir + i + "/type");
+                    Scanner scanner = new Scanner(file);
+                    String type = scanner.nextLine();
+                    String pattern = "(?i)(.*)(cpu)(.*)";
+                    System.out.println(dir + i +"/temp" + " " + val );
+                    if (type.matches(pattern)){
+                        System.out.println("Type = " + type);
+                        suhu.add(val);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         double temp = 0.0;

@@ -27,7 +27,7 @@ public class NotificationGPC {
     }
 
     private void createNotificationChannel(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.   O){
             NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
                     "Perekaman Data Otomatis Selesai", NotificationManager.IMPORTANCE_LOW);
             notificationChannel.enableLights(false);

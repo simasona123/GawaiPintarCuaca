@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import androidx.annotation.NonNull;
@@ -48,7 +49,7 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
     List <Address> addresses = null;
 
     public interface AsyncResponse {
-        void processFinish(String kabupaten, String provinsi);
+        void processFinish(String kabupaten, String provinsi, String s);
     }
 
     public AsyncResponse listener = null;
@@ -65,6 +66,7 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
     @Override
     protected String doInBackground(Void... voids) {
         x = 0;
+        lokasi = "Tidak ada Lokasi";
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         String bestProvider = String.valueOf(locationManager.getBestProvider(criteria, true)).toString();
@@ -78,7 +80,7 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
                     longitude = String.format("%.4f",location.getLongitude());
                     altitude = String.valueOf(location.getAltitude());
                     location1 = location;
-                    System.out.println("LocationFused "+ location);
+                    lokasi = "lat; long; -> " + latitude + "; " + longitude;
                 }
                 else {
                     locationManager.requestLocationUpdates(bestProvider, 1000, 0, new LocationListener() {
@@ -92,69 +94,70 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
                 }
             }
         });
-        System.out.println("x = " + x);
         try{
             Thread.sleep(2 * 1000);
-            System.out.println("Tidur 1 detik");
         }
         catch (InterruptedException e){
             e.printStackTrace();
         }
         if (x==0){
             try{
-                System.out.println("Tidur 10 detik");
                 Thread.sleep(7 * 1000);
             }
             catch (InterruptedException e){
                 e.printStackTrace();
             }
         }
-        try{
-            addresses = geocoder.getFromLocation(
-                    location1.getLatitude(),
-                    location1.getLongitude(),
-                    1);
-        }
-        catch (IOException | NullPointerException e){
-            resultMesage = "Service Not Available";
-            Log.e(TAG, resultMesage, e);
-        }
-        catch (IllegalArgumentException illegalArgumentException){
-            resultMesage = "Invalid Coordinates Supplied";
-            Log.e(TAG, resultMesage, illegalArgumentException);
-        }
-        if (addresses == null || addresses.size() == 0){
-            if (resultMesage.isEmpty()){
-                resultMesage = "Address Not Found";
-                Log.e(TAG, resultMesage);
-                lokasi = resultMesage;
-            }
+        if (location1 == null){
+            return "Lokasi Tidak Dapat Ditemukan, Silahkan Keluar dan Kembali Beberapa Saat Lagi";
         }
         else{
-            Address address = addresses.get(0);
-            ArrayList <String> addressParts = new ArrayList<>();
-            for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
-                addressParts.add(address.getAddressLine(i));
+            try{
+                addresses = geocoder.getFromLocation(
+                        location1.getLatitude(),
+                        location1.getLongitude(),
+                        1);
             }
-            resultMesage = TextUtils.join("\n", addressParts);
-            System.out.println("alamat lengkap " + resultMesage);
-            kabupaten = address.getSubAdminArea();
-            provinsi = address.getAdminArea();
-            String local = address.getLocality();
-            String sublocal = address.getSubLocality();
-            System.out.println( "Subadmin = " + kabupaten + " Admin Area = " + provinsi + " local = " + local + " sub local = " + sublocal);
-            Log.e(TAG, resultMesage);
-            lokasi = kabupaten + ", " + provinsi;
+            catch (IOException | NullPointerException e){
+                resultMesage = "Service Not Available";
+                Log.e(TAG, resultMesage, e);
+            }
+            catch (IllegalArgumentException illegalArgumentException){
+                resultMesage = "Invalid Coordinates Supplied";
+                Log.e(TAG, resultMesage, illegalArgumentException);
+            }
+            if (addresses == null || addresses.size() == 0){
+                if (resultMesage.isEmpty()){
+                    resultMesage = "Address Not Found";
+                    Log.e(TAG, resultMesage);
+                    lokasi = resultMesage;
+                }
+            }
+            else{
+                Address address = addresses.get(0);
+                ArrayList <String> addressParts = new ArrayList<>();
+                for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
+                    addressParts.add(address.getAddressLine(i));
+                }
+                resultMesage = TextUtils.join("\n", addressParts);
+                System.out.println("alamat lengkap " + resultMesage);
+                kabupaten = address.getSubAdminArea();
+                provinsi = address.getAdminArea();
+                String local = address.getLocality();
+                String sublocal = address.getSubLocality();
+                System.out.println( "Subadmin = " + kabupaten + " Admin Area = " + provinsi + " local = " + local + " sub local = " + sublocal);
+                Log.e(TAG, resultMesage);
+                lokasi = kabupaten + ", " + provinsi;
+            }
         }
+        System.out.println(lokasi);
         return lokasi;
     }
 
     @Override
     protected void onPostExecute(String s) {
+        System.out.println(lokasi + " final");
         super.onPostExecute(s);
-        mTextView.get().setText(s);
-        listener.processFinish(kabupaten, provinsi);
+        listener.processFinish(kabupaten, provinsi, s);
     }
 }
-//TODO Tes di API HP gagah
-//TODO beberapa description kabupaten di prediksi cuaca ngaco

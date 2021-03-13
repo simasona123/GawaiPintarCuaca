@@ -18,19 +18,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public final int VERSION_DB = 1;
 
     public static final String COLUMN_DataID = "DataID";
-    public static final String COLUMN_TIME_STAMP = "TimeStamp";
-    public static final String COLUMN_LATITUDE = "Latitude";
-    public static final String COLUMN_LONGITUDE = "Longitude";
-    public static final String COLUMN_ALTITUDE = "Altitude";
-    private static final String COLUMN_ALTITUDE1 = "AltitudeAPI" ;
-    public static final String COLUMN_SUHU_UDARA = "SuhuUdara";
-    public static final String COLUMN_KELEMBABAN_UDARA = "KelembabanUdara";
-    public static final String COLUMN_SUHU_BATERAI = "SuhuBaterai";
-    public static final String COLUMN_TEKANAN_UDARA = "TekananUdara";
-    public static final String COLUMN_CPU_TEMPERATURE = "CpuTemperature";
+    public static final String COLUMN_TIME_STAMP = "timestamp";
+    public static final String COLUMN_LATITUDE = "latitude";
+    public static final String COLUMN_LONGITUDE = "longitude";
+    public static final String COLUMN_ALTITUDE = "altitude";
+    private static final String COLUMN_ALTITUDE1 = "altitude1" ;
+    public static final String COLUMN_SUHU_UDARA = "suhu_udara";
+    public static final String COLUMN_KELEMBABAN_UDARA = "kelembaban_udara";
+    public static final String COLUMN_SUHU_BATERAI = "suhu_baterai";
+    public static final String COLUMN_TEKANAN_UDARA = "tekanan_udara";
+    public static final String COLUMN_CPU_TEMPERATURE = "suhu_cpu";
     public static final String COLUMN_DIKIRIM = "Dikirim";
-    public static final String COLUMNSTATUS_LAYAR = "StatusLayar";
-    public static final String COLUMN_STATUS_BATERAI = "StatusBaterai";
+    public static final String COLUMNSTATUS_LAYAR = "status_layar";
+    public static final String COLUMN_STATUS_BATERAI = "status_charging";
 
 
     public DatabaseHelper(@Nullable Context context) {
@@ -79,6 +79,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return insert != -1;
     }
+
     public ArrayList<DataModel> getData(){
         ArrayList<DataModel> returnList = new ArrayList<>();
         String SQLStatement = "SELECT * FROM " + TABLE_DB + " ORDER BY " + COLUMN_DataID + " DESC LIMIT 20";
@@ -111,8 +112,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return returnList;
     }
 
+    public ArrayList<DataModel> getUnsendingData(){
+        ArrayList<DataModel> returnList= new ArrayList<>();
+        String sqlQuery = "SELECT * FROM "+ TABLE_DB +" WHERE " + COLUMN_DIKIRIM + " = 0;";
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery(sqlQuery, null);
+        if(cursor.moveToFirst()){
+            System.out.println(cursor);
+            do{
+                String timeStamp = cursor.getString(1);
+                float latitude = cursor.getFloat(2);
+                float longitude = cursor.getFloat(3);
+                float altitude = cursor.getFloat(4);
+                float altitude1 = cursor.getFloat(5);
+                float suhuUdara = cursor.getFloat(6);
+                float kelembabanUdara = cursor.getFloat(7);
+                float suhuBaterai = cursor.getFloat(8);
+                float tekananUdara = cursor.getFloat(9);
+                float cpuTemperatur = cursor.getFloat(10);
+                boolean statusLayar = cursor.getInt(12) == 1;
+                boolean statusBaterai = cursor.getInt(13) == 1;
+                DataModel dataModel = new DataModel(timeStamp, latitude, longitude, altitude
+                        , altitude1, suhuUdara, kelembabanUdara, suhuBaterai, tekananUdara
+                        , cpuTemperatur, statusLayar, statusBaterai);
+                returnList.add(dataModel);
+            }while(cursor.moveToNext());
+        }
+        cursor.close();
+        return returnList;
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
+
+
 }

@@ -8,6 +8,9 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -57,6 +60,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
     Preferences preferences = new Preferences();
 
     private final int PEREKAMAN_DATA = 0;
+    private static final int JOB_ID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +73,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         requestPermissionStorage();
 
         sharedPreferences = getSharedPreferences(preferences.SHARED_PRE_FILE, MODE_PRIVATE);
-        System.out.println(sharedPreferences.getString(preferences.MODEL, null) + sharedPreferences.getString(preferences.VERSION_RELEASE, null));
+        System.out.println(sharedPreferences.getString(preferences.MODEL, null)+ "  " + sharedPreferences.getString(preferences.VERSION_RELEASE, null));
         key_UUID = sharedPreferences.getString("key_UUID", null);
 
         suhuBaterai = findViewById(R.id.rtSuhuBat);
@@ -98,20 +102,36 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
 
         Calendar calendar = Calendar.getInstance();
         milis = calendar.getTimeInMillis();
-        x = milis % (60*1000*3);
+        x = milis % (60 * 1000 * Constants.PERIODE_REKAMAN_MENIT);
         startAlarm(this, calendar);
         createDatabase();
+        createJobScheduler();
+
     }
 
-    private void createDatabase() {
-        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+    private void createJobScheduler() {
+        JobScheduler jobScheduler;
+        jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+        ComponentName serviceName = new ComponentName(getPackageName(), SendData.class.getName());
+        JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, serviceName);
+        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setRequiresCharging(true);/*.setPeriodic(1000*60*Constants.PERIODE_PENGIRIMAN_DATA)*/
+        JobInfo jobInfo = builder.build();
+        int resultCode = jobScheduler.schedule(jobInfo);
+        if(resultCode <= 0){
+            System.out.println("Job Scheduler Gagal");
+        }
     }
 
     private void startAlarm(Context context, Calendar calendar) {
         Intent notifyIntent = new Intent(this, MyReceiver.class);
         PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(context, PEREKAMAN_DATA, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + (1000*60*3 - x), notifyPendingIntent);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT - x), notifyPendingIntent);
+    }
+
+
+    private void createDatabase() {
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
     }
 
     @Override
@@ -135,7 +155,6 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
             System.out.println("Request External Storage");
         }
     }
-
 
     private String batteryReadTemperature(Context context) {
         Intent intent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
