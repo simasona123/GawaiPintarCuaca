@@ -17,6 +17,6 @@ public class Constants {
         a.put("Sumatera Utara", "https://data.bmkg.go.id/datamkg/MEWS/DigitalForecast/DigitalForecast-SumateraUtara.xml");
         return Collections.unmodifiableMap(a);
     }
-    public static final int PERIODE_REKAMAN_MENIT = 2; //TODO Atur waktu 10 menit sesuai dengan permintaan teman
+    public static final int PERIODE_REKAMAN_MENIT = 120; //TODO Atur waktu 10 menit sesuai dengan permintaan teman
     public static final int PERIODE_PENGIRIMAN_DATA = 5; //TODO Atur waktu menit sekali
 }

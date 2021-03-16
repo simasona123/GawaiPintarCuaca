@@ -5,8 +5,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 public class Preferences {
-    public final String SHARED_PRE_FILE = "com.example.gpc1";
-    public final String KEY_UUID = "key_UUID";
-    public final String MODEL = "model";
-    public final String VERSION_RELEASE = "version_release";
+    public final static String SHARED_PRE_FILE = "com.example.gpc1";
+    public final static String KEY_UUID = "key_UUID";
+    public final static String MODEL = "model";
+    public final static String VERSION_RELEASE = "version_release";
 }

@@ -30,36 +30,12 @@ public class DataModel {
     SharedPreferences sharedPreferences;
     Preferences preferences = new Preferences();
 
-    public double getAltitude1() {
-        return altitude1;
-    }
 
-    public void setAltitude1(double altitude1) {
-        this.altitude1 = altitude1;
-    }
-
-    public DataModel(String timeStamp, double latitude, double longitude,
+    public DataModel(int id, String timeStamp, double latitude, double longitude,
                      double altitude, double altitude1, float suhuUdara, float kelembabanUdara,
                      float suhuBaterai, float tekananUdara, float cpuTemperatur,
-                     boolean dikirim, boolean statusLayar, boolean statusBaterai) {
-        this.timeStamp = timeStamp;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.altitude = altitude;
-        this.altitude1 = altitude1;
-        this.suhuUdara = suhuUdara;
-        this.kelembabanUdara = kelembabanUdara;
-        this.suhuBaterai = suhuBaterai;
-        this.tekananUdara = tekananUdara;
-        this.cpuTemperatur = cpuTemperatur;
-        this.dikirim = dikirim;
-        this.statusLayar = statusLayar;
-        this.statusBaterai = statusBaterai;
-    }
-
-    public DataModel(String timeStamp, double latitude, double longitude, double altitude, double altitude1
-            , float suhuUdara, float kelembabanUdara, float suhuBaterai, float tekananUdara, float cpuTemperatur
-            , boolean statusLayar, boolean statusBaterai) {
+                     boolean statusLayar, boolean statusBaterai) {
+        this.id = id;
         this.timeStamp = timeStamp;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -99,7 +75,9 @@ public class DataModel {
 
     @Override
     public String toString() {
-        return  "id: "+ id +
+
+
+        return  "id: "+ this.id +
                 "{ time: "+ timeStamp +
                 "; lat: " + new DecimalFormat("#.####").format(latitude)+
                 "; long: " +new DecimalFormat("#.####").format(longitude)+
@@ -116,20 +94,13 @@ public class DataModel {
                 '}';
     }
 
-    public String toString1(){
-        return  "{ timestamp: "+ timeStamp +
-                "; latitude: " + new DecimalFormat("#.####").format(latitude)+
-                "; longitude: " +new DecimalFormat("#.####").format(longitude)+
-                "; altitude: " + new DecimalFormat("#.##").format(altitude) +
-                "; altitude1: " + new DecimalFormat("#.##").format(altitude1) +
-                "; suhu_udara: " + suhuUdara +
-                "; kelembaban_udara: " + kelembabanUdara +
-                "; suhu_baterai: " + suhuBaterai +
-                "; tekanan_udara: " + tekananUdara +
-                "; suhu_cpu: " + cpuTemperatur +
-                "; status_layar: " + statusLayar +
-                "; status_charging: " + statusBaterai +
-                '}';
+
+    public double getAltitude1() {
+        return altitude1;
+    }
+
+    public void setAltitude1(double altitude1) {
+        this.altitude1 = altitude1;
     }
 
     public String getTimeStamp() {
@@ -228,11 +199,13 @@ public class DataModel {
         this.statusBaterai = statusBaterai;
     }
 
-    public String toJSON (Context context){
-        JSONObject jsonObject = new JSONObject();
-        try{
-            sharedPreferences = context.getSharedPreferences(preferences.SHARED_PRE_FILE, MODE_PRIVATE);
+    public int getId() {
+        return id;
+    }
 
+    public JSONObject toJSON () {
+        JSONObject jsonObject = new JSONObject();
+        try {
             jsonObject.put("timestamp", this.timeStamp);
             jsonObject.put("latitude", this.latitude);
             jsonObject.put("longitude", this.longitude);
@@ -245,15 +218,10 @@ public class DataModel {
             jsonObject.put("suhu_cpu", this.cpuTemperatur);
             jsonObject.put("status_layar", this.statusLayar);
             jsonObject.put("status_charging", this.statusBaterai);
-            jsonObject.put("uuid", sharedPreferences.getString(preferences.KEY_UUID, null));
-            jsonObject.put("model", sharedPreferences.getString(preferences.MODEL, null));
-            jsonObject.put("api_version", sharedPreferences.getString(preferences.VERSION_RELEASE, null));
-            return jsonObject.toString();
-
-        }
-        catch (JSONException e){
+            return jsonObject;
+        } catch (JSONException e) {
             e.printStackTrace();
-            return " ";
+            return null;
         }
     }
 }

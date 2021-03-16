@@ -120,6 +120,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if(cursor.moveToFirst()){
             System.out.println(cursor);
             do{
+                int id = cursor.getInt(0);
                 String timeStamp = cursor.getString(1);
                 float latitude = cursor.getFloat(2);
                 float longitude = cursor.getFloat(3);
@@ -132,7 +133,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 float cpuTemperatur = cursor.getFloat(10);
                 boolean statusLayar = cursor.getInt(12) == 1;
                 boolean statusBaterai = cursor.getInt(13) == 1;
-                DataModel dataModel = new DataModel(timeStamp, latitude, longitude, altitude
+                DataModel dataModel = new DataModel(id, timeStamp, latitude, longitude, altitude
                         , altitude1, suhuUdara, kelembabanUdara, suhuBaterai, tekananUdara
                         , cpuTemperatur, statusLayar, statusBaterai);
                 returnList.add(dataModel);
@@ -147,5 +148,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+    public boolean updateStatusKirim(DataModel dataModel){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COLUMN_DataID, dataModel.getId());
+        cv.put(COLUMN_TIME_STAMP, dataModel.getTimeStamp());
+        cv.put(COLUMN_LATITUDE, dataModel.getLatitude());
+        cv.put(COLUMN_ALTITUDE, dataModel.getAltitude());
+        cv.put(COLUMN_LONGITUDE, dataModel.getLongitude());
+        cv.put(COLUMN_ALTITUDE1, dataModel.getAltitude1());
+        cv.put(COLUMN_SUHU_UDARA, dataModel.getSuhuUdara());
+        cv.put(COLUMN_SUHU_BATERAI, dataModel.getSuhuBaterai());
+        cv.put(COLUMN_KELEMBABAN_UDARA, dataModel.getKelembabanUdara());
+        cv.put(COLUMN_TEKANAN_UDARA, dataModel.getTekananUdara());
+        cv.put(COLUMN_CPU_TEMPERATURE, dataModel.getCpuTemperatur());
+        cv.put(COLUMN_DIKIRIM, dataModel.isDikirim());
+        cv.put(COLUMNSTATUS_LAYAR, dataModel.isStatusLayar());
+        cv.put(COLUMN_STATUS_BATERAI, dataModel.isStatusBaterai());
+        return db.update(TABLE_DB, cv, COLUMN_DataID + " = " + dataModel.getId(), null) > 0;
+    }
 
 }

@@ -52,7 +52,7 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
     protected String doInBackground(Void... voids){
         alamatLinkProvinsi = Constants.alamatXml.get(provinsi);
         waktu = Calendar.getInstance().getTime();
-        if (kabupaten == null){
+        if (kabupaten == null || alamatLinkProvinsi == null) {
             return "Tidak ada Lokasi";
         }
         else{

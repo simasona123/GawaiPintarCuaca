@@ -65,7 +65,6 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
     @SuppressLint("MissingPermission")
     @Override
     protected String doInBackground(Void... voids) {
-        x = 0;
         lokasi = "Tidak ada Lokasi";
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
@@ -82,16 +81,6 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
                     location1 = location;
                     lokasi = "lat; long; -> " + latitude + "; " + longitude;
                 }
-                else {
-                    locationManager.requestLocationUpdates(bestProvider, 1000, 0, new LocationListener() {
-                        @Override
-                        public void onLocationChanged(@NonNull Location location2) {
-                            locationManager.removeUpdates(this);
-                            System.out.println("LocationManager" + location2);
-                            location1 = location2;
-                        }
-                    });
-                }
             }
         });
         try{
@@ -99,14 +88,6 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
         }
         catch (InterruptedException e){
             e.printStackTrace();
-        }
-        if (x==0){
-            try{
-                Thread.sleep(7 * 1000);
-            }
-            catch (InterruptedException e){
-                e.printStackTrace();
-            }
         }
         if (location1 == null){
             return "Lokasi Tidak Dapat Ditemukan, Silahkan Keluar dan Kembali Beberapa Saat Lagi";
@@ -146,7 +127,6 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
                 String local = address.getLocality();
                 String sublocal = address.getSubLocality();
                 System.out.println( "Subadmin = " + kabupaten + " Admin Area = " + provinsi + " local = " + local + " sub local = " + sublocal);
-                Log.e(TAG, resultMesage);
                 lokasi = kabupaten + ", " + provinsi;
             }
         }

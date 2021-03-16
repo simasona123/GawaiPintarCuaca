@@ -28,7 +28,7 @@ public class OneLineReader {
             try {
                 value = Double.parseDouble(str);
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
                 value = null;
             }
             return value;

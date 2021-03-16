@@ -211,7 +211,7 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
                         suhu.add(val);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                 }
             }
         }
@@ -244,6 +244,7 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
     @SuppressLint("MissingPermission")
     private void retrieveLocation(Location location) {
         if(location != null){ //Jangan Lupa diganti tidak sama dengan untuk penggunaan
+            System.out.println("Last Location a = " + location );
             lastLocation = location;
         }
         FusedLocationProviderClient fusedLocationProviderClient1 = LocationServices.getFusedLocationProviderClient(this);
@@ -327,7 +328,7 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
 //                stopService(intent);
 //            }
 //        });
-//        requestQueue.add(request);
+//        requestQueue.add(request); //TODO Jangan lupa
         dataRekaman.setAltitude1(0);
         databaseHelper.addData(dataRekaman);
         notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");

@@ -17,7 +17,6 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
-//TODO sudah diperiksa LogActivity
 
 public class LogActivity extends Activity {
 
