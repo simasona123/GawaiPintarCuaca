@@ -18,5 +18,5 @@ public class Constants {
         return Collections.unmodifiableMap(a);
     }
     public static final int PERIODE_REKAMAN_MENIT = 120; //TODO Atur waktu 10 menit sesuai dengan permintaan teman
-    public static final int PERIODE_PENGIRIMAN_DATA = 5; //TODO Atur waktu menit sekali
+    public static final int PERIODE_PENGIRIMAN_DATA = 120; //TODO Atur waktu menit sekali
 }

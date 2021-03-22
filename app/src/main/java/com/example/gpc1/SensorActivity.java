@@ -105,7 +105,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         x = milis % (60 * 1000 * Constants.PERIODE_REKAMAN_MENIT);
         startAlarm(this, calendar);
         createDatabase();
-        createJobScheduler();
+        createJobScheduler(); //TODO Job Scheduler
 
     }
 
@@ -119,6 +119,9 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         int resultCode = jobScheduler.schedule(jobInfo);
         if(resultCode <= 0){
             System.out.println("Job Scheduler Gagal");
+        }
+        else{
+            System.out.println("Job Scheduler Berhasil");
         }
     }
 

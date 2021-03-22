@@ -307,6 +307,7 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
 //                    System.out.println("altitudeAPI = "+ altitude1);
 //                    dataRekaman.setAltitude1(altitude1);
 //                    databaseHelper.addData(dataRekaman);
+//                    requestQueue.stop();
 //                    notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
 //                    System.out.println(dataRekaman.toString());
 //                    stopService(intent);
@@ -314,7 +315,6 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
 //                catch (JSONException e) {
 //                    e.printStackTrace();
 //                }
-//                requestQueue.stop();
 //            }
 //        }, new Response.ErrorListener() {
 //            @Override
@@ -332,8 +332,7 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
         dataRekaman.setAltitude1(0);
         databaseHelper.addData(dataRekaman);
         notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
-        System.out.println(dataRekaman.toString());
-        stopService(intent);
         sensorManager.unregisterListener(IntentServicePerekamanData.this);
+        stopService(intent);
     }
 }

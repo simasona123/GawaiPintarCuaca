@@ -1,4 +1,4 @@
-package com.example.gpc1;
+    package com.example.gpc1;
 
 import android.app.NotificationManager;
 import android.app.job.JobParameters;
@@ -15,6 +15,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,6 +53,10 @@ public class SendData extends JobService {
                 JSONArray jsonArray = new JSONArray();
                 for(int i = 0; i < unsendingData.size(); i++){
                     try {
+                        if(i == 2){ // Maksimal 30 Data
+                            System.out.println("break");
+                            break;
+                        }
                         jsonArray.put(i, unsendingData.get(i).toJSON());
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -68,8 +73,6 @@ public class SendData extends JobService {
                     e.printStackTrace();
                 }
                 sendData(jsonObject, params);
-                notificationGPC.deliverNotification("Pengiriman Data Berhasil");
-                jobFinished(params, true);
 
             }
         }).start();
@@ -85,12 +88,15 @@ public class SendData extends JobService {
             public void onResponse(JSONObject response) {
                 System.out.println("Berhasil");
                 Log.i("boma", response.toString());
+                notificationGPC.deliverNotification("Pengiriman Data Berhasil");
+                jobFinished(params, true);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 System.out.println("Gagal");
                 Log.i("Pengiriman Data", "Gagal " + error);
+                notificationGPC.deliverNotification("Pengiriman Data Gagal");
                 jobFinished(params, true);
             }
         });

@@ -213,7 +213,7 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     @SuppressLint("SetTextI18n")
     @Override
     public void processFinish(ArrayList<Integer> kelembabanParsing, ArrayList<Float> suhuParsing, ArrayList<Integer> kodeCuaca, ArrayList<Date> waktuCuaca, String s) {
-        if(waktuCuaca.size() == 0){
+        if(waktuCuaca.size() == 0 || waktuCuaca == null){
             waktu.setText("Tidak dapat menemukan prediksi cuaca");
             waktu1.setText("Tidak dapat" +"\n" + "menemukan" +"\n" + "prediksi cuaca");
             waktu2.setText("Tidak dapat" +"\n" + "menemukan" + "\n" + "prediksi cuaca");
@@ -223,9 +223,8 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
             kelembaban.setText("-");
             kelembaban1.setText("-");
             kelembaban2.setText("-");
-
         }
-        if(s.equals("Tidak ada Lokasi")){
+        else if(s.equals("Tidak ada Lokasi")){
             lokasiMainTextView.setText(lokasi);
         }
         else{
