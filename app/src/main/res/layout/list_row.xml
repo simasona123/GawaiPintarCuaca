@@ -20,5 +20,4 @@
             android:paddingLeft="10dp"
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
-
 </RelativeLayout>

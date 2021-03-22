@@ -53,7 +53,7 @@ public class SendData extends JobService {
                 JSONArray jsonArray = new JSONArray();
                 for(int i = 0; i < unsendingData.size(); i++){
                     try {
-                        if(i == 2){ // Maksimal 30 Data
+                        if(i == 30){ // Maksimal 30 Data
                             System.out.println("break");
                             break;
                         }
@@ -89,6 +89,18 @@ public class SendData extends JobService {
                 System.out.println("Berhasil");
                 Log.i("boma", response.toString());
                 notificationGPC.deliverNotification("Pengiriman Data Berhasil");
+                int i = 0;
+                for(DataModel data:unsendingData){
+                    boolean status = databaseHelper.updateStatusKirim(data);
+                    if (!status){
+                        System.out.println("Gagal Update Status Kirim Data" + i);
+                        break;
+                    }
+                    else{
+                        System.out.println("Berhasil Update Status Kirim Data" + i);
+                    }
+                    i++;
+                }
                 jobFinished(params, true);
             }
         }, new Response.ErrorListener() {

@@ -5,6 +5,7 @@ package com.example.gpc1;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,20 +34,22 @@ public class LogActivity extends Activity {
     }
     public class CustomAdapter extends ArrayAdapter<DataModel>{
         TextView parameter;
+        private ArrayList<DataModel> dataList = new ArrayList<>();
 
         public CustomAdapter(@NonNull Context context, ArrayList<DataModel> data) {
             super(context, R.layout.list_row, data);
+            this.dataList = data;
         }
 
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            DataModel dataModel = getItem(position);
+
             if (convertView == null){
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_row, parent, false);
-                parameter = convertView.findViewById(R.id.data);
-                System.out.println(parameter);
             }
+            DataModel dataModel = dataList.get(position);
+            parameter = convertView.findViewById(R.id.data);
             parameter.setText(dataModel.toString());
             return convertView;
         }

@@ -114,7 +114,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public ArrayList<DataModel> getUnsendingData(){
         ArrayList<DataModel> returnList= new ArrayList<>();
-        String sqlQuery = "SELECT * FROM "+ TABLE_DB +" WHERE " + COLUMN_DIKIRIM + " = 0;";
+        String sqlQuery = "SELECT * FROM "+ TABLE_DB +" WHERE " + COLUMN_DIKIRIM + " = 0 LIMIT 35;";
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery(sqlQuery, null);
         if(cursor.moveToFirst()){
@@ -162,7 +162,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(COLUMN_KELEMBABAN_UDARA, dataModel.getKelembabanUdara());
         cv.put(COLUMN_TEKANAN_UDARA, dataModel.getTekananUdara());
         cv.put(COLUMN_CPU_TEMPERATURE, dataModel.getCpuTemperatur());
-        cv.put(COLUMN_DIKIRIM, dataModel.isDikirim());
+        cv.put(COLUMN_DIKIRIM, 1);
         cv.put(COLUMNSTATUS_LAYAR, dataModel.isStatusLayar());
         cv.put(COLUMN_STATUS_BATERAI, dataModel.isStatusBaterai());
         return db.update(TABLE_DB, cv, COLUMN_DataID + " = " + dataModel.getId(), null) > 0;
