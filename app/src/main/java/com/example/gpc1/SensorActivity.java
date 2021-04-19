@@ -22,6 +22,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -105,10 +106,22 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         x = milis % (60 * 1000 * Constants.PERIODE_REKAMAN_MENIT);
         createDatabase();
         startAlarm(this, calendar);
+        rekamDataSaatBukaMenu(); //TODO Rekam Data Saat Buka Menu
 //        createJobScheduler(); //TODO Job Scheduler
 
     }
 
+    private void rekamDataSaatBukaMenu(){
+        Intent intent1 = this.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int baterai = intent1.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        Intent intentService = new Intent(this, IntentServicePerekamanData.class);
+        intentService.putExtra("statusBaterai", baterai);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            this.startForegroundService(intentService);
+        } else {
+            this.startService(intentService);
+        }
+    }
     private void createJobScheduler() {
         JobScheduler jobScheduler;
         jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);

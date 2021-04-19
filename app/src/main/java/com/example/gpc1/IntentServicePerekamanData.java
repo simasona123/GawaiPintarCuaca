@@ -296,43 +296,43 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
         System.out.println("LocationManager = " + latitude + ", " + longitude + ", "+ altitude);
         RequestQueue requestQueue = Volley.newRequestQueue(IntentServicePerekamanData.this);
         String url = "https://api.opentopodata.org/v1/srtm30m?locations=" + latitude + "," + longitude + "&interpolation=cubic";
-//        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,null
-//                , new Response.Listener<JSONObject>() {
-//            @Override
-//            public void onResponse(JSONObject response) {
-//                try {
-//                    JSONArray results = response.getJSONArray("results");
-//                    JSONObject jsonObject = results.getJSONObject(0);
-//                    altitude1 = jsonObject.getDouble("elevation");
-//                    System.out.println("altitudeAPI = "+ altitude1);
-//                    dataRekaman.setAltitude1(altitude1);
-//                    databaseHelper.addData(dataRekaman);
-//                    requestQueue.stop();
-//                    notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
-//                    System.out.println(dataRekaman.toString());
-//                    stopService(intent);
-//                }
-//                catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                dataRekaman.setAltitude1(0);
-//                requestQueue.stop();
-//                System.out.println("Error API");
-//                databaseHelper.addData(dataRekaman);
-//                notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
-//                System.out.println(dataRekaman.toString());
-//                stopService(intent);
-//            }
-//        });
-//        requestQueue.add(request); //TODO Jangan lupa
-        dataRekaman.setAltitude1(0);
-        databaseHelper.addData(dataRekaman);
-        notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
-        sensorManager.unregisterListener(IntentServicePerekamanData.this);
-        stopService(intent);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,null
+                , new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray results = response.getJSONArray("results");
+                    JSONObject jsonObject = results.getJSONObject(0);
+                    altitude1 = jsonObject.getDouble("elevation");
+                    System.out.println("altitudeAPI = "+ altitude1);
+                    dataRekaman.setAltitude1(altitude1);
+                    databaseHelper.addData(dataRekaman);
+                    requestQueue.stop();
+                    notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
+                    System.out.println(dataRekaman.toString());
+                    stopService(intent);
+                }
+                catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                dataRekaman.setAltitude1(0);
+                requestQueue.stop();
+                System.out.println("Error API");
+                databaseHelper.addData(dataRekaman);
+                notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
+                System.out.println(dataRekaman.toString());
+                stopService(intent);
+            }
+        });
+        requestQueue.add(request); //TODO Jangan dihapus/diubah
+//        dataRekaman.setAltitude1(0);
+//        databaseHelper.addData(dataRekaman);
+//        notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
+//        sensorManager.unregisterListener(IntentServicePerekamanData.this);
+//        stopService(intent);
     }
 }
