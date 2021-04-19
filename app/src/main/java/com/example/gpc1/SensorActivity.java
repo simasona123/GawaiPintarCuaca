@@ -105,7 +105,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         milis = calendar.getTimeInMillis();
         x = milis % (60 * 1000 * Constants.PERIODE_REKAMAN_MENIT);
         createDatabase();
-        startAlarm(this, calendar);
+//        startAlarm(this, calendar);
         rekamDataSaatBukaMenu(); //TODO Rekam Data Saat Buka Menu
 //        createJobScheduler(); //TODO Job Scheduler
 
