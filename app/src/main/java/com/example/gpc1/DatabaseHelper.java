@@ -12,8 +12,6 @@ import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-
-    public final String DB_NAME = "gpcDB";
     public static final String TABLE_DB = "gpcTable";
     public final int VERSION_DB = 1;
 

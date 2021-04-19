@@ -27,7 +27,6 @@ import java.util.ArrayList;
 public class SendData extends JobService {
     NotificationManager notificationManager;
     NotificationGPC notificationGPC;
-    DataModel dataModel;
     DatabaseHelper databaseHelper;
     ArrayList<DataModel> unsendingData;
     SharedPreferences sharedPreferences;
@@ -51,12 +50,9 @@ public class SendData extends JobService {
                 unsendingData = new ArrayList<>();
                 unsendingData = databaseHelper.getUnsendingData();
                 JSONArray jsonArray = new JSONArray();
+                System.out.println("unsendingDataSize = " + unsendingData.size());
                 for(int i = 0; i < unsendingData.size(); i++){
                     try {
-                        if(i == 30){ // Maksimal 30 Data
-                            System.out.println("break");
-                            break;
-                        }
                         jsonArray.put(i, unsendingData.get(i).toJSON());
                     } catch (JSONException e) {
                         e.printStackTrace();

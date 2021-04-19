@@ -26,11 +26,7 @@ public class DataModel {
     private boolean dikirim;
     private boolean statusLayar;
     private boolean statusBaterai;
-
-    SharedPreferences sharedPreferences;
-    Preferences preferences = new Preferences();
-
-
+    
     public DataModel(int id, String timeStamp, double latitude, double longitude,
                      double altitude, double altitude1, float suhuUdara, float kelembabanUdara,
                      float suhuBaterai, float tekananUdara, float cpuTemperatur,
