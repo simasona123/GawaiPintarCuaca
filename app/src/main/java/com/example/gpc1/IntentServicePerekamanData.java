@@ -294,6 +294,14 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
             dataRekaman.setCpuTemperatur((float)getCurrentCPUTemperature());
         }
         System.out.println("LocationManager = " + latitude + ", " + longitude + ", "+ altitude);
+        altiOnline1();
+//        dataRekaman.setAltitude1(0);
+//        databaseHelper.addData(dataRekaman);
+//        notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
+//        sensorManager.unregisterListener(IntentServicePerekamanData.this);
+//        stopService(intent);
+    }
+    private void altiOnline1 () {
         RequestQueue requestQueue = Volley.newRequestQueue(IntentServicePerekamanData.this);
         String url = "https://api.opentopodata.org/v1/srtm30m?locations=" + latitude + "," + longitude + "&interpolation=cubic";
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,null
@@ -329,10 +337,7 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
             }
         });
         requestQueue.add(request); //TODO Jangan dihapus/diubah
-//        dataRekaman.setAltitude1(0);
-//        databaseHelper.addData(dataRekaman);
-//        notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
-//        sensorManager.unregisterListener(IntentServicePerekamanData.this);
-//        stopService(intent);
     }
+
+
 }

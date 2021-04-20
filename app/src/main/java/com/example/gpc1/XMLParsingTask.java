@@ -69,10 +69,11 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
             XmlPullParser xmlPullParser = Xml.newPullParser();
             xmlPullParser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES,true);
             System.out.println("URL = " + url);
-            if(getInputStream(url) == null){
+            InputStream inputStream = getInputStream(url);
+            if(inputStream == null){
                 return"gagal";
             }
-            xmlPullParser.setInput(getInputStream(url), "UTF-8");
+            xmlPullParser.setInput(inputStream, "UTF-8");
             xmlPullParser.nextTag();
             xmlPullParser.nextTag();
             String tagName = xmlPullParser.getName();
