@@ -1,4 +1,4 @@
-package com.example.gpc1;
+package com.example.gpc1.menus;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Geocoder;
-import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
@@ -23,6 +22,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.gpc1.background.LocationTask;
+import com.example.gpc1.Preferences;
+import com.example.gpc1.R;
+import com.example.gpc1.background.XMLParsingTask;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
