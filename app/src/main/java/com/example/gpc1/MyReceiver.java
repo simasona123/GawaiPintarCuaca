@@ -9,6 +9,9 @@ import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Build;
 
+import com.example.gpc1.background.IntentServicePerekamanData;
+import com.example.gpc1.menus.SensorActivity;
+
 import java.util.Calendar;
 
 

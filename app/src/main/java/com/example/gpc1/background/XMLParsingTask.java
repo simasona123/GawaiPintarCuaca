@@ -1,8 +1,10 @@
-package com.example.gpc1;
+package com.example.gpc1.background;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.util.Xml;
+
+import com.example.gpc1.Constants;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;

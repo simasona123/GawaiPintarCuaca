@@ -1,4 +1,4 @@
-package com.example.gpc1;
+package com.example.gpc1.menus;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -30,6 +30,14 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.gpc1.Constants;
+import com.example.gpc1.background.CpuUsageTask;
+import com.example.gpc1.DatabaseHelper;
+import com.example.gpc1.background.IntentServicePerekamanData;
+import com.example.gpc1.MyReceiver;
+import com.example.gpc1.Preferences;
+import com.example.gpc1.R;
+import com.example.gpc1.SendData;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.DecimalFormat;

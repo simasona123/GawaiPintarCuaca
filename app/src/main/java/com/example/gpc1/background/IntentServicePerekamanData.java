@@ -1,4 +1,4 @@
-package com.example.gpc1;
+package com.example.gpc1.background;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -30,6 +30,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.gpc1.DataModel;
+import com.example.gpc1.DatabaseHelper;
+import com.example.gpc1.NotificationGPC;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -48,7 +51,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
-import java.util.TimeZone;
 
 public class IntentServicePerekamanData extends Service implements SensorEventListener {
     NotificationManager notificationManager;

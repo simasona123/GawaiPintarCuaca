@@ -1,4 +1,4 @@
-package com.example.gpc1;
+package com.example.gpc1.menus;
 
 
 
@@ -15,6 +15,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.example.gpc1.DataModel;
+import com.example.gpc1.DatabaseHelper;
+import com.example.gpc1.R;
 
 import java.util.ArrayList;
 

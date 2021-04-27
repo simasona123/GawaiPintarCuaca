@@ -1,28 +1,12 @@
-package com.example.gpc1;
+package com.example.gpc1.background;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.os.StrictMode;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Scanner;
-
-import static androidx.core.app.ActivityCompat.requestPermissions;
 
 public class CpuUsageTask extends AsyncTask <Void, Void, Double> {
 

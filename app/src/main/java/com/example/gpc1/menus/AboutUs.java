@@ -1,7 +1,6 @@
-package com.example.gpc1;
+package com.example.gpc1.menus;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -10,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.gpc1.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class AboutUs extends Activity implements BottomNavigationView.OnNavigationItemSelectedListener {

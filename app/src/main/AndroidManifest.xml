@@ -5,61 +5,57 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-
-
     <application
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.GPC1"
-        tools:ignore="AllowBackup"
-        android:allowBackup="true">
+        tools:ignore="AllowBackup">
+        <activity android:name=".Splash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <receiver
             android:name=".MyReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_ADDED"/>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
             </intent-filter>
         </receiver>
 
         <service
-            android:name=".IntentServicePerekamanData"
+            android:name=".background.IntentServicePerekamanData"
             android:enabled="true"
             android:foregroundServiceType="location">
             <intent-filter>
-                <action android:name="android.location.PROVIDERS_CHANGED"/>
-                <action android:name="android.location.MODE_CHANGED"/>
+                <action android:name="android.location.PROVIDERS_CHANGED" />
+                <action android:name="android.location.MODE_CHANGED" />
             </intent-filter>
         </service>
-
         <service
             android:name=".SendData"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <activity android:name=".LogActivity" />
-        <activity android:name=".AboutUs" />
-        <activity android:name=".SensorActivity" />
-        <activity
-            android:name=".MainActivity"
-            android:launchMode="singleTask">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".menus.LogActivity" />
+        <activity android:name=".menus.AboutUs" />
+        <activity android:name=".menus.SensorActivity" />
+        <activity android:name=".menus.MainActivity"
+            android:launchMode="singleTask"/>
     </application>
 
 </manifest>
