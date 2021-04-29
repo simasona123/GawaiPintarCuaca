@@ -7,5 +7,10 @@
     <string name="location_text">Latitude: %1$.4f \n Longitude: %2$.4f \n Timestamp: %3$tr</string>
     <string name="no_sensor">Tidak Ada Sensor</string>
     <string name="sensor_real_time">Sensor Real Time</string>
-    <string name="about1">BOMA ANAJNG PJKLJFLKAJFKLJAKJ</string>
+    <string name="about1">GPC adalah sebuah aplikasi hasil penelitian mahasiswa STMKG dengan Bapak Hariyanto, M.T yang bertujuan untuk
+        meningkatkan resolusi spasial data meteorologi di Indonesia dengan memanfaatkan metode crowdsourcing.
+    </string>
+    <string name="about2"> GPC memanfaatkan sensor yang
+        tertanam pada smartphone untuk merekam data yang dibutuhkan  dan kemudian dikirim ke server secara otomatis untuk diolah ataupun
+        dimanfaatkan lebih lanjut. Oleh karena itu, peran serta masyarakat sangat dibutuhkan untuk membantu penyelesaian penelitian ini.</string>
 </resources>

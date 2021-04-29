@@ -5,15 +5,24 @@ import androidx.annotation.NonNull;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.TextView;
 
+import com.example.gpc1.Preferences;
 import com.example.gpc1.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+
 public class AboutUs extends Activity implements BottomNavigationView.OnNavigationItemSelectedListener {
     private static final String LOG_TAG = "AboutUsActivity";
+    SharedPreferences sharedPreferences;
+    Preferences preferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,6 +30,46 @@ public class AboutUs extends Activity implements BottomNavigationView.OnNavigati
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.page_3);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
+        TextView linkWeb = (TextView) findViewById(R.id.linkWeb);
+        linkWeb.setMovementMethod(LinkMovementMethod.getInstance());
+        String linkWebText = "<a href='http://www.google.com'>Lihat Data</a>";
+        if(Build.VERSION.SDK_INT >= 24){
+            linkWeb.setText(Html.fromHtml(linkWebText, Html.FROM_HTML_MODE_COMPACT));
+        }
+        else{
+            linkWeb.setText(Html.fromHtml(linkWebText));
+        }
+        TextView linkStmkg = (TextView) findViewById(R.id.linkStmkg);
+        linkStmkg.setMovementMethod(LinkMovementMethod.getInstance());
+        String linkStmkgText= "<a href=\"https://stmkg.ac.id/\">STMKG Official</a>";
+        if(Build.VERSION.SDK_INT >= 24){
+            linkStmkg.setText(Html.fromHtml(linkStmkgText, Html.FROM_HTML_MODE_COMPACT));
+        }
+        else{
+            linkStmkg.setText(Html.fromHtml(linkStmkgText));
+        }
+        TextView linkEmail = (TextView) findViewById(R.id.linkEmail);
+        linkEmail.setMovementMethod(LinkMovementMethod.getInstance());
+        sharedPreferences = getSharedPreferences(preferences.SHARED_PRE_FILE, MODE_PRIVATE);
+        System.out.println(sharedPreferences.getString(preferences.MODEL, null)+ "  " + sharedPreferences.getString(preferences.VERSION_RELEASE, null));
+        String key_UUID = sharedPreferences.getString("key_UUID", null);
+        String linkEmailText= "<a href=\"mailto: boma.anjang.pertala@stmkg.ac.id?subject= "+ key_UUID +"&body=Tulis Kritik atau Saran" +
+                " \">Send Feedback</a>";
+        if(Build.VERSION.SDK_INT >= 24){
+            linkEmail.setText(Html.fromHtml(linkEmailText, Html.FROM_HTML_MODE_COMPACT));
+        }
+        else{
+            linkEmail.setText(Html.fromHtml(linkEmailText));
+        }
+        TextView linkGithub = (TextView) findViewById(R.id.linkGithub);
+        linkGithub.setMovementMethod(LinkMovementMethod.getInstance());
+        String linkGithubText= "<a href=\"https://github.com/simasona123/Skripsi\">Source Code</a>";
+        if(Build.VERSION.SDK_INT >= 24){
+            linkGithub.setText(Html.fromHtml(linkGithubText, Html.FROM_HTML_MODE_COMPACT));
+        }
+        else{
+            linkGithub.setText(Html.fromHtml(linkGithubText));
+        }
     }
 
     @SuppressLint("NonConstantResourceId")
