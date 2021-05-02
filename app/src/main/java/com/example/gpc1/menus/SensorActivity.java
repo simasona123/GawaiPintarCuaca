@@ -2,6 +2,9 @@ package com.example.gpc1.menus;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -16,7 +19,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -31,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.gpc1.Constants;
+import com.example.gpc1.WorkerClass;
 import com.example.gpc1.background.CpuUsageTask;
 import com.example.gpc1.DatabaseHelper;
 import com.example.gpc1.background.IntentServicePerekamanData;
@@ -42,11 +45,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class SensorActivity extends Activity implements BottomNavigationView.OnNavigationItemSelectedListener, SensorEventListener, CpuUsageTask.CpuUsageTaskFinish {
     private static final String LOG_TAG = SensorActivity.class.getSimpleName();
-    private final int STORAGE_PERMISSION_CODE = 1;
-    SQLiteDatabase gpcDatabase;
     long milis;
     long x;
 
@@ -56,19 +58,11 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
     private Sensor mKelembabanUdara;
     private Sensor mTekananUdara;
 
-    private final String NO_SENSOR = "- ";
     private TextView cpuUsage;
-    private TextView suhuBaterai;
     private TextView tekananUdara;
     private TextView suhuUdara;
     private TextView kelembabanUdara;
-    private TextView uuID;
 
-    private String key_UUID;
-    private SharedPreferences sharedPreferences;
-    Preferences preferences = new Preferences();
-
-    private final int PEREKAMAN_DATA = 0;
     private static final int JOB_ID = 0;
 
     @Override
@@ -81,17 +75,18 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
 
         requestPermissionStorage();
 
-        sharedPreferences = getSharedPreferences(preferences.SHARED_PRE_FILE, MODE_PRIVATE);
-        System.out.println(sharedPreferences.getString(preferences.MODEL, null)+ "  " + sharedPreferences.getString(preferences.VERSION_RELEASE, null));
-        key_UUID = sharedPreferences.getString("key_UUID", null);
+        SharedPreferences sharedPreferences = getSharedPreferences(Preferences.SHARED_PRE_FILE, MODE_PRIVATE);
+        System.out.println(sharedPreferences.getString(Preferences.MODEL, null)+ "  " + sharedPreferences.getString(Preferences.VERSION_RELEASE, null));
+        String key_UUID = sharedPreferences.getString("key_UUID", null);
 
-        suhuBaterai = findViewById(R.id.rtSuhuBat);
+        TextView suhuBaterai = findViewById(R.id.rtSuhuBat);
         tekananUdara = findViewById(R.id.rtTekananUdara);
         suhuUdara = findViewById(R.id.rtSuhuUdara);
         kelembabanUdara = findViewById(R.id.rtKelembabanUdara);
-        uuID = findViewById(R.id.userID);
+        TextView uuID = findViewById(R.id.userID);
         cpuUsage = findViewById(R.id.rtCpu);
 
+        String NO_SENSOR = "- ";
         if(mSuhuUdara == null){
             suhuUdara.setText(NO_SENSOR);
         }
@@ -110,13 +105,10 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         uuID.setText(key_UUID);
 
         Calendar calendar = Calendar.getInstance();
-        milis = calendar.getTimeInMillis();
-        x = milis % (60 * 1000 * Constants.PERIODE_REKAMAN_MENIT);
         createDatabase();
-//        startAlarm(this, calendar);
-        rekamDataSaatBukaMenu(); //TODO Rekam Data Saat Buka Menu
+        startAlarm(this, calendar); //TODO Rekam data offline
 //        createJobScheduler(); //TODO Job Scheduler
-
+        rekamDataSaatBukaMenu(); //TODO Rekam Data Saat Buka Menu
     }
 
     private void rekamDataSaatBukaMenu(){
@@ -130,27 +122,47 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
             this.startService(intentService);
         }
     }
+
     private void createJobScheduler() {
-        JobScheduler jobScheduler;
-        jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
-        ComponentName serviceName = new ComponentName(getPackageName(), SendData.class.getName());
-        JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, serviceName);
-        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setRequiresCharging(true);/*.setPeriodic(1000*60*Constants.PERIODE_PENGIRIMAN_DATA)*/
-        JobInfo jobInfo = builder.build();
-        int resultCode = jobScheduler.schedule(jobInfo);
-        if(resultCode <= 0){
-            System.out.println("Job Scheduler Gagal");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            JobScheduler jobScheduler;
+            jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+            ComponentName serviceName = new ComponentName(getPackageName(), SendData.class.getName());
+            JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, serviceName);
+            builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setRequiresCharging(true)
+                    .setPeriodic(1000*60*Constants.PERIODE_PENGIRIMAN_DATA);
+            JobInfo jobInfo = builder.build();
+            int resultCode = jobScheduler.schedule(jobInfo);
+            if(resultCode <= 0){
+                System.out.println("Job Scheduler Gagal");
+            }
+            else{
+                System.out.println("Job Scheduler Berhasil");
+            }
         }
-        else{
-            System.out.println("Job Scheduler Berhasil");
+        else {
+            WorkManager workManager = WorkManager.getInstance();
+            PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest.Builder(WorkerClass.class,
+                    Constants.PERIODE_PENGIRIMAN_DATA, TimeUnit.MINUTES).build();
+            workManager.enqueueUniquePeriodicWork("Worker", ExistingPeriodicWorkPolicy.KEEP, periodicWorkRequest);
         }
     }
 
     private void startAlarm(Context context, Calendar calendar) {
         Intent notifyIntent = new Intent(this, MyReceiver.class);
-        PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(context, PEREKAMAN_DATA, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(context, 0, notifyIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT - x), notifyPendingIntent);
+        milis = calendar.getTimeInMillis();
+        x = milis % (60 * 1000 * Constants.PERIODE_REKAMAN_MENIT);
+        if (Build.VERSION.SDK_INT >= 19) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, milis +
+                    (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT - x), notifyPendingIntent);
+        }
+        else{
+            alarmManager.set(AlarmManager.RTC_WAKEUP, milis +
+                    (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT - x), notifyPendingIntent);
+        }
     }
 
 
@@ -161,6 +173,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        int STORAGE_PERMISSION_CODE = 1;
         if(requestCode == STORAGE_PERMISSION_CODE){
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 requestPermissionStorage();
@@ -187,7 +200,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
     }
 
     public void bukaLogActivity(View view) {
-        Intent bukaLog = new Intent(this,LogActivity.class);
+        Intent bukaLog = new Intent(this, LogActivity.class);
         startActivity(bukaLog);
     }
 
@@ -233,18 +246,6 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
     }
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d(LOG_TAG,"On ReStart");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG,"On Resume");
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
         Log.d(LOG_TAG,"On Pause");
@@ -266,12 +267,6 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         catch (NullPointerException e ){
             System.out.println(LOG_TAG + e + "2");
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG,"On Destroy");
     }
 
 

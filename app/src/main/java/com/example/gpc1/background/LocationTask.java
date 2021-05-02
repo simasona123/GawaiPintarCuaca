@@ -29,13 +29,12 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
     String latitude;
     String longitude;
     String lokasi;
-    String timeStamp;
     String kabupaten;
     String provinsi;
     String altitude;
     int x;
 
-    private final Context context;
+    Context context;
     private final WeakReference <TextView> mTextView;
     FusedLocationProviderClient fusedLocationProviderClient;
     Geocoder geocoder;
@@ -48,7 +47,7 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
         void processFinish(String kabupaten, String provinsi, String s);
     }
 
-    public AsyncResponse listener = null;
+    public AsyncResponse listener;
 
     public LocationTask(AsyncResponse listener, Context context1, Geocoder geocoder1, FusedLocationProviderClient fusedLocationProviderClient, TextView tv) {
         this.mTextView = new WeakReference<>(tv);

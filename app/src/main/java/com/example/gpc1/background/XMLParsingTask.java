@@ -38,7 +38,7 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
 
     int x;
 
-    XMLParsingTaskResponses listener = null;
+    XMLParsingTaskResponses listener;
 
     public interface XMLParsingTaskResponses {
         void processFinish (ArrayList <Integer> kelembaban, ArrayList<Float> suhu, ArrayList<Integer> kodeCuaca, ArrayList<Date> waktucuaca,String s);
@@ -73,7 +73,7 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
             System.out.println("URL = " + url);
             InputStream inputStream = getInputStream(url);
             if(inputStream == null){
-                return"gagal";
+                return "gagal";
             }
             xmlPullParser.setInput(inputStream, "UTF-8");
             xmlPullParser.nextTag();

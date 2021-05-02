@@ -63,8 +63,8 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     String lokasi;
 
     private SharedPreferences sharedPreferences;
-    private Preferences preferences = new Preferences();
-    private final String sharedPrefFile = preferences.SHARED_PRE_FILE;
+    private final Preferences preferences = new Preferences();
+    private final String sharedPrefFile = Preferences.SHARED_PRE_FILE;
 
     @SuppressLint({"MissingPermission", "SetTextI18n"})
     @Override
@@ -115,12 +115,12 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     protected void onStart() {
         super.onStart();
         sharedPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
-        if (sharedPreferences.getString(preferences.KEY_UUID, null) == null){
+        if (sharedPreferences.getString(Preferences.KEY_UUID, null) == null){
             String uuID = UUID.randomUUID().toString();
             SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
-            preferencesEditor.putString(preferences.KEY_UUID, uuID);
-            preferencesEditor.putString(preferences.MODEL, Build.MODEL);
-            preferencesEditor.putString(preferences.VERSION_RELEASE, Build.VERSION.RELEASE);
+            preferencesEditor.putString(Preferences.KEY_UUID, uuID);
+            preferencesEditor.putString(Preferences.MODEL, Build.MODEL);
+            preferencesEditor.putString(Preferences.VERSION_RELEASE, Build.VERSION.RELEASE);
             preferencesEditor.apply();
         }
     }
@@ -170,15 +170,12 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case REQUEST_LOCATION_PERMISSION :
-                if (grantResults.length > 0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
-                    locationAccessPermission();
-                }
-                else{
-                    Toast.makeText(this, "Harap Setujui izin permintaan lokasi dan nyalakan GPS", Toast.LENGTH_LONG).show();
-                }
-                break;
+        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                locationAccessPermission();
+            } else {
+                Toast.makeText(this, "Harap Setujui izin permintaan lokasi dan nyalakan GPS", Toast.LENGTH_LONG).show();
+            }
         }
     }
 

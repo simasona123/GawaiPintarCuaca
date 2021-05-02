@@ -1,14 +1,9 @@
 package com.example.gpc1;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DecimalFormat;
-
-import static android.content.Context.MODE_PRIVATE;
 
 //TODO Data Model Sudah Diperiksa
 public class DataModel {

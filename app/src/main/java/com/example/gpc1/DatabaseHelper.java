@@ -13,7 +13,6 @@ import java.util.ArrayList;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String TABLE_DB = "gpcTable";
-    public final int VERSION_DB = 1;
 
     public static final String COLUMN_DataID = "DataID";
     public static final String COLUMN_TIME_STAMP = "timestamp";

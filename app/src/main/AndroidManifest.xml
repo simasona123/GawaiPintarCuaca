@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <permission android:name="com.example.gpc1.permission.gpc" android:protectionLevel="normal"
+        android:label="GPC Permission"/>
 
     <application
         android:allowBackup="true"
@@ -33,9 +35,6 @@
             android:name=".MyReceiver"
             android:enabled="true"
             android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_ADDED" />
-            </intent-filter>
         </receiver>
 
         <service
@@ -50,7 +49,6 @@
         <service
             android:name=".SendData"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <activity android:name=".menus.LogActivity" />
         <activity android:name=".menus.AboutUs" />
         <activity android:name=".menus.SensorActivity" />

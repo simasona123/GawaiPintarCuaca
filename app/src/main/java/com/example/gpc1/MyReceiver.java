@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.util.Log;
 
 import com.example.gpc1.background.IntentServicePerekamanData;
 import com.example.gpc1.menus.SensorActivity;
@@ -17,10 +18,6 @@ import java.util.Calendar;
 
 public class MyReceiver extends BroadcastReceiver{
     Context context;
-    SensorActivity sensorActivity;
-    Calendar calendar;
-    long milis;
-    long x;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -39,11 +36,17 @@ public class MyReceiver extends BroadcastReceiver{
     }
     private void startAlarm(Context context) {
         Calendar calendar = Calendar.getInstance();
-        milis = calendar.getTimeInMillis();
-        x = milis % (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT);
+        long milis = calendar.getTimeInMillis();
+        long x = milis % (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT);
         Intent notifyIntent = new Intent(context, MyReceiver.class);
         PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT - x), notifyPendingIntent);
+        if (Build.VERSION.SDK_INT >= 19){
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, milis + (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT - x), notifyPendingIntent);
+        }
+        else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, milis +
+                    (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT - x), notifyPendingIntent);
+        }
     }
 }
