@@ -295,9 +295,12 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
         }
         System.out.println("LocationManager = " + latitude + ", " + longitude + ", "+ altitude);
         sharedPreferences = getSharedPreferences(Preferences.SHARED_PRE_FILE, MODE_PRIVATE);
+        float selisihLat = Math.abs(sharedPreferences.getFloat(Preferences.LAT_RECENTLY, 1f) - (float)latitude);
+        float selisihLong = Math.abs(sharedPreferences.getFloat(Preferences.LONG_RECENTLY, 1f) - (float)longitude);
         if (sharedPreferences.getFloat(Preferences.LAT_RECENTLY, 1f) == 1f ||
-                sharedPreferences.getFloat(Preferences.LAT_RECENTLY, 1f) - (float)latitude >= 0.0002f ||
-        sharedPreferences.getFloat(Preferences.ALT1_RECENTLY, 0f) == 0f) {
+                sharedPreferences.getFloat(Preferences.LONG_RECENTLY, 1f) == 1f ||
+                selisihLat >= 0.0002f || selisihLong >= 0.0002f ||
+                sharedPreferences.getFloat(Preferences.ALT1_RECENTLY, 0f) == 0f) {
             altiOnline1();
             SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
             preferencesEditor.putFloat(Preferences.LAT_RECENTLY, (float)latitude);

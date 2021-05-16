@@ -52,17 +52,25 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... voids){
-        alamatLinkProvinsi = Constants.alamatXml.get(provinsi);
+        try{
+            alamatLinkProvinsi = Constants.alamatXml.get(provinsi);
+        }
+        catch(Exception e){
+            System.out.println("Alamat LinkXml Null");
+        }
         waktu = Calendar.getInstance().getTime();
         if (kabupaten == null || alamatLinkProvinsi == null) {
+            System.out.println("ke sini");
             return "Tidak ada Lokasi";
         }
         else{
             kabupaten = kabupaten.toLowerCase();
+            System.out.println(kabupaten);
         }
         try {
+            System.out.println(kabupaten);
+            System.out.println(provinsi);
             url = new URL(alamatLinkProvinsi);
-
         }
         catch (MalformedURLException e) {
             e.printStackTrace();
