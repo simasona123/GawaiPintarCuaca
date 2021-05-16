@@ -304,6 +304,7 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
             altiOnline1();
             SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
             preferencesEditor.putFloat(Preferences.LAT_RECENTLY, (float)latitude);
+            preferencesEditor.putFloat(Preferences.LONG_RECENTLY, (float)longitude);
             preferencesEditor.apply();
         }
         else{
