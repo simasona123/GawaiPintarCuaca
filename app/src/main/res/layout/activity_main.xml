@@ -60,12 +60,12 @@
                 android:animateLayoutChanges="true"
                 android:orientation="vertical">
                 <!-- cuacaIcon -->
-                <ImageView
+                <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/cuacaIcon"
                     android:layout_width="163dp"
                     android:layout_height="163dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_cloudy"
+                    app:srcCompat="@drawable/ic_cloudy"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/lokasi"
@@ -186,12 +186,12 @@
                             android:text="11 Januari 12:00"
                             android:textAlignment="center" />
 
-                        <ImageView
+                        <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/cuacaIcon1"
                             android:layout_width="80dp"
                             android:layout_height="80dp"
                             android:scaleType="fitXY"
-                            android:src="@drawable/ic_cloudy" />
+                            app:srcCompat="@drawable/ic_cloudy" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -264,12 +264,12 @@
                             android:text="11 Januari 12:00"
                             android:textAlignment="center" />
 
-                        <ImageView
+                        <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/cuacaIcon2"
                             android:layout_width="80dp"
                             android:layout_height="80dp"
                             android:scaleType="fitXY"
-                            android:src="@drawable/ic_cloudy" />
+                            app:srcCompat="@drawable/ic_cloudy" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"

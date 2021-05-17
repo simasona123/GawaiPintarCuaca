@@ -132,12 +132,12 @@
 
 
     <!-- Menu Bottom Navigation -->
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imageView"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginRight="40dp"
-        android:src="@drawable/ic_logo"
+        app:srcCompat="@drawable/ic_logo"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout15" />

@@ -30,7 +30,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_editor_absoluteX="0dp" />
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/log"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -38,7 +38,7 @@
             android:layout_gravity="center"
             android:layout_marginEnd="20dp"
             android:scaleType="fitEnd"
-            android:src="@drawable/ic_log"
+            app:srcCompat="@drawable/ic_log"
             android:onClick="bukaLogActivity"
             android:contentDescription="Log"
             tools:ignore="HardcodedText" />
