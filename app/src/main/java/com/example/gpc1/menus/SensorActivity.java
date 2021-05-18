@@ -58,7 +58,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
     private Sensor mKelembabanUdara;
     private Sensor mTekananUdara;
 
-    private TextView cpuUsage;
+    private TextView suhuCpu;
     private TextView tekananUdara;
     private TextView suhuUdara;
     private TextView kelembabanUdara;
@@ -76,7 +76,8 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         requestPermissionStorage();
 
         SharedPreferences sharedPreferences = getSharedPreferences(Preferences.SHARED_PRE_FILE, MODE_PRIVATE);
-        System.out.println(sharedPreferences.getString(Preferences.MODEL, null)+ "  " + sharedPreferences.getString(Preferences.VERSION_RELEASE, null));
+        System.out.println(sharedPreferences.getString(Preferences.MODEL, null)+ "  " +
+                sharedPreferences.getString(Preferences.VERSION_RELEASE, null));
         String key_UUID = sharedPreferences.getString("key_UUID", null);
 
         TextView suhuBaterai = findViewById(R.id.rtSuhuBat);
@@ -84,7 +85,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         suhuUdara = findViewById(R.id.rtSuhuUdara);
         kelembabanUdara = findViewById(R.id.rtKelembabanUdara);
         TextView uuID = findViewById(R.id.userID);
-        cpuUsage = findViewById(R.id.rtCpu);
+        suhuCpu = findViewById(R.id.rtCpu);
 
         String NO_SENSOR = "- ";
         if(mSuhuUdara == null){
@@ -97,7 +98,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
             tekananUdara.setText(NO_SENSOR);
         }
         if(mSuhuCPU == null){
-            cpuUsage.setText(NO_SENSOR);
+            suhuCpu.setText(NO_SENSOR);
             new CpuUsageTask(this).execute();
         }
 
@@ -285,7 +286,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
                 tekananUdara.setText(new DecimalFormat("####.##").format(currentValue));
                 break;
             case Sensor.TYPE_TEMPERATURE:
-                cpuUsage.setText(new DecimalFormat("##.##").format(currentValue));
+                suhuCpu.setText(new DecimalFormat("##.##").format(currentValue));
                 break;
         }
     }
@@ -297,6 +298,6 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
 
     @Override
     public void processFinish(double cpuTemperature) {
-        cpuUsage.setText(new DecimalFormat("##.##").format(cpuTemperature));
+        suhuCpu.setText(new DecimalFormat("##.##").format(cpuTemperature));
     }
 }

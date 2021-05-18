@@ -55,6 +55,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class IntentServicePerekamanData extends Service implements SensorEventListener {
     NotificationManager notificationManager;
@@ -204,13 +206,16 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
         for (String dir : dirs) {
             for(int i = 0 ; i <= 90 ;i ++){
                 try {
-                    Double val = OneLineReader.getValue(dir + i  +"/temp");
-                    File file = new File (dir + i + "/type");
+                    Double val = OneLineReader.getValue(dir + i  +"/temp"); // "sys/class/thermal/thermal_zone0/temp"
+                    File file = new File (dir + i + "/type");  // "sys/class/thermal/thermal_zone0/type"
                     Scanner scanner = new Scanner(file);
                     String type = scanner.nextLine();
-                    String pattern = "(?i)(.*)(cpu)(.*)";
+                    String pattern = "(i?)(.*)(cpu)(.*)";
+                    Pattern pattern1 = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
+                    Matcher matcher = pattern1.matcher(type);
+                    System.out.println("Type = " + type);
                     System.out.println(dir + i +"/temp" + " " + val );
-                    if (type.matches(pattern)){
+                    if (matcher.matches()){
                         System.out.println("Type = " + type);
                         suhu.add(val);
                     }

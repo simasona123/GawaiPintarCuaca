@@ -7,6 +7,8 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CpuUsageTask extends AsyncTask <Void, Void, Double> {
 
@@ -33,19 +35,21 @@ public class CpuUsageTask extends AsyncTask <Void, Void, Double> {
     }
 
     private double getCurrentCPUTemperature() {
-        String [] dirs = {"sys/class/thermal/thermal_zone",
-                        };
+        String [] dirs = {"sys/class/thermal/thermal_zone",};
         ArrayList <Double> suhu = new ArrayList<>();
         for (String dir : dirs) {
             for(int i = 0 ; i <= 90 ;i ++){
                 try {
-                    Double val = OneLineReader.getValue(dir + i  +"/temp");
-                    File file = new File (dir + i + "/type");
+                    Double val = OneLineReader.getValue(dir + i  +"/temp"); // "sys/class/thermal/thermal_zone0/temp"
+                    File file = new File (dir + i + "/type");  // "sys/class/thermal/thermal_zone0/type"
                     Scanner scanner = new Scanner(file);
                     String type = scanner.nextLine();
-                    String pattern = "(?i)(.*)(cpu)(.*)";
+                    String pattern = "(i?)(.*)(cpu)(.*)";
+                    Pattern pattern1 = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
+                    Matcher matcher = pattern1.matcher(type);
+                    System.out.println("Type = " + type);
                     System.out.println(dir + i +"/temp" + " " + val );
-                    if (type.matches(pattern)){
+                    if (matcher.matches()){
                         System.out.println("Type = " + type);
                         suhu.add(val);
                     }
@@ -54,6 +58,7 @@ public class CpuUsageTask extends AsyncTask <Void, Void, Double> {
                 }
             }
         }
+
         double temp = 0.0;
         for (int i = 0; i < suhu.size() ; i++){
             double suhuAnggota = suhu.get(i);
