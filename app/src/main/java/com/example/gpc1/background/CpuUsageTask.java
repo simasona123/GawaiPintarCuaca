@@ -54,7 +54,7 @@ public class CpuUsageTask extends AsyncTask <Void, Void, Double> {
                         suhu.add(val);
                     }
                 } catch (Exception e) {
-//                    e.printStackTrace();
+                       e.printStackTrace();
                 }
             }
         }
