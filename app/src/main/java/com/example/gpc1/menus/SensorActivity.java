@@ -25,7 +25,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,7 +57,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
     private TextView tekananUdara;
     private TextView suhuUdara;
     private TextView kelembabanUdara;
-    private ImageView logMenu;
+
     private static final int JOB_ID = 0;
 
     @Override
@@ -66,15 +65,9 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor);
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        logMenu = findViewById(R.id.log);
         bottomNavigationView.setSelectedItemId(R.id.page_2);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
-        logMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bukaLogActivity(v);
-            }
-        });
+
         requestPermissionStorage();
         createDatabase();
         SharedPreferences sharedPreferences = getSharedPreferences(Preferences.SHARED_PRE_FILE, MODE_PRIVATE);
