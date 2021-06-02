@@ -8,7 +8,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -18,25 +17,23 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.net.ConnectivityManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.gpc1.Constants;
-import com.example.gpc1.receiver.ReceiverPengirimanData;
 import com.example.gpc1.background.CpuUsageTask;
 import com.example.gpc1.datamodel.DatabaseHelper;
 import com.example.gpc1.background.IntentServicePerekamanData;
 import com.example.gpc1.receiver.ReceiverPerekamanData;
 import com.example.gpc1.Preferences;
 import com.example.gpc1.R;
-import com.example.gpc1.receiver.ReceiverPerubahanJaringan;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.DecimalFormat;
@@ -52,7 +49,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
     private Sensor mSuhuCPU;
     private Sensor mKelembabanUdara;
     private Sensor mTekananUdara;
-
+    private ImageView logMenu;
     private TextView suhuCpu;
     private TextView tekananUdara;
     private TextView suhuUdara;
@@ -67,14 +64,19 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.page_2);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
-
+        logMenu = findViewById(R.id.log);
         requestPermissionStorage();
         createDatabase();
         SharedPreferences sharedPreferences = getSharedPreferences(Preferences.SHARED_PRE_FILE, MODE_PRIVATE);
         System.out.println(sharedPreferences.getString(Preferences.MODEL, null)+ "  " +
                 sharedPreferences.getString(Preferences.VERSION_RELEASE, null));
         String key_UUID = sharedPreferences.getString("key_UUID", null);
-
+        logMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bukaLogActivity(v);
+            }
+        });
         TextView suhuBaterai = findViewById(R.id.rtSuhuBat);
         tekananUdara = findViewById(R.id.rtTekananUdara);
         suhuUdara = findViewById(R.id.rtSuhuUdara);

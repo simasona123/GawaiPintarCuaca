@@ -54,11 +54,7 @@ public class CpuUsageTask extends AsyncTask <Void, Void, Double> {
                         suhu.add(val);
                     }
                 } catch (Exception e) {
-<<<<<<< HEAD
-//                       e.printStackTrace();
-=======
-//                    e.printStackTrace();
->>>>>>> parent of a7b76d9... Android versi 4 sudah berhasil
+                    e.printStackTrace();
                 }
             }
         }
