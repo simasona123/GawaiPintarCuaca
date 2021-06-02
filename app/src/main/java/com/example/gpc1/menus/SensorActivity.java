@@ -2,18 +2,13 @@ package com.example.gpc1.menus;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -23,6 +18,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.ConnectivityManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,19 +30,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.gpc1.Constants;
-import com.example.gpc1.WorkerClass;
+import com.example.gpc1.receiver.ReceiverPengirimanData;
 import com.example.gpc1.background.CpuUsageTask;
-import com.example.gpc1.DatabaseHelper;
+import com.example.gpc1.datamodel.DatabaseHelper;
 import com.example.gpc1.background.IntentServicePerekamanData;
-import com.example.gpc1.MyReceiver;
+import com.example.gpc1.receiver.ReceiverPerekamanData;
 import com.example.gpc1.Preferences;
 import com.example.gpc1.R;
-import com.example.gpc1.SendData;
+import com.example.gpc1.receiver.ReceiverPerubahanJaringan;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 
 public class SensorActivity extends Activity implements BottomNavigationView.OnNavigationItemSelectedListener, SensorEventListener, CpuUsageTask.CpuUsageTaskFinish {
     private static final String LOG_TAG = SensorActivity.class.getSimpleName();
@@ -81,7 +76,7 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
             }
         });
         requestPermissionStorage();
-
+        createDatabase();
         SharedPreferences sharedPreferences = getSharedPreferences(Preferences.SHARED_PRE_FILE, MODE_PRIVATE);
         System.out.println(sharedPreferences.getString(Preferences.MODEL, null)+ "  " +
                 sharedPreferences.getString(Preferences.VERSION_RELEASE, null));
@@ -108,14 +103,10 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
             suhuCpu.setText(NO_SENSOR);
             new CpuUsageTask(this).execute();
         }
-
         suhuBaterai.setText(batteryReadTemperature(this));
         uuID.setText(key_UUID);
-
         Calendar calendar = Calendar.getInstance();
-        createDatabase();
-        startAlarm(this, calendar); //TODO Rekam data offline
-//        createJobScheduler(); //TODO Job Scheduler
+        startAlarmRecordData(this, calendar); //TODO Rekam data offline dan pengiriman data
         rekamDataSaatBukaMenu(); //TODO Rekam Data Saat Buka Menu
     }
 
@@ -131,33 +122,8 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         }
     }
 
-    private void createJobScheduler() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            JobScheduler jobScheduler;
-            jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
-            ComponentName serviceName = new ComponentName(getPackageName(), SendData.class.getName());
-            JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, serviceName);
-            builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setRequiresCharging(true)
-                    .setPeriodic(1000*60*Constants.PERIODE_PENGIRIMAN_DATA);
-            JobInfo jobInfo = builder.build();
-            int resultCode = jobScheduler.schedule(jobInfo);
-            if(resultCode <= 0){
-                System.out.println("Job Scheduler Gagal");
-            }
-            else{
-                System.out.println("Job Scheduler Berhasil");
-            }
-        }
-        else {
-            WorkManager workManager = WorkManager.getInstance();
-            PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest.Builder(WorkerClass.class,
-                    Constants.PERIODE_PENGIRIMAN_DATA, TimeUnit.MINUTES).build();
-            workManager.enqueueUniquePeriodicWork("Worker", ExistingPeriodicWorkPolicy.KEEP, periodicWorkRequest);
-        }
-    }
-
-    private void startAlarm(Context context, Calendar calendar) {
-        Intent notifyIntent = new Intent(this, MyReceiver.class);
+    private void startAlarmRecordData(Context context, Calendar calendar) {
+        Intent notifyIntent = new Intent(this, ReceiverPerekamanData.class);
         PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(context, 0, notifyIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -172,7 +138,6 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
                     (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT - x), notifyPendingIntent);
         }
     }
-
 
     private void createDatabase() {
         DatabaseHelper databaseHelper = new DatabaseHelper(this);
@@ -307,4 +272,5 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
     public void processFinish(double cpuTemperature) {
         suhuCpu.setText(new DecimalFormat("##.##").format(cpuTemperature));
     }
+
 }

@@ -5,7 +5,6 @@ package com.example.gpc1.menus;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +15,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.gpc1.DataModel;
-import com.example.gpc1.DatabaseHelper;
+import com.example.gpc1.datamodel.DataModel;
+import com.example.gpc1.datamodel.DatabaseHelper;
 import com.example.gpc1.R;
 
 import java.util.ArrayList;

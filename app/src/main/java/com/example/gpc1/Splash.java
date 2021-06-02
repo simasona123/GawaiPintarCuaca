@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.example.gpc1.datamodel.DatabaseHelper;
 import com.example.gpc1.menus.MainActivity;
 
 public class Splash extends Activity {
@@ -22,6 +23,6 @@ public class Splash extends Activity {
                 startActivity(mainActivity);
                 finish();
             }
-        }, 2000);
+        }, 1000);
     }
 }

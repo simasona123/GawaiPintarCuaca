@@ -12,4 +12,7 @@ public class Preferences {
     public final static String LAT_RECENTLY = "Latitude_recently";
     public final static String LONG_RECENTLY = "Longitude_recently";
     public final static String ALT1_RECENTLY = "Altitude_recently";
+    public final static String USER_MAKS = "User_Maksimal";
+    public final static String ID_USER = "ID_User";
+    public final static String SCHEDULING_COUNT = "Scheduling_Count";
 }

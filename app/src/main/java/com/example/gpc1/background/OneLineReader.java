@@ -33,9 +33,9 @@ public class OneLineReader {
             }
             return value;
         } catch (FileNotFoundException e1) {
-            throw e1;
+//            throw e1;
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         return null;
     }

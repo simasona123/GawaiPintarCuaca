@@ -1,11 +1,11 @@
-package com.example.gpc1;
+package com.example.gpc1.datamodel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DecimalFormat;
 
-//TODO Data Model Sudah Diperiksa
+
 public class DataModel {
     private int id;
     private String timeStamp;

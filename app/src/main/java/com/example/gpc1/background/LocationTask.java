@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
@@ -26,25 +25,26 @@ import java.util.List;
 public class LocationTask extends AsyncTask <Void, Void, String> {
 
     private final String TAG =  LocationTask.class.getSimpleName();
-    String latitude;
-    String longitude;
-    String lokasi;
-    String kabupaten;
-    String provinsi;
-    String altitude;
-    int x;
+    private String latitude;
+    private String longitude;
+    private String lokasi;
+    private String kabupaten;
+    private String provinsi;
+    private String altitude;
+    private String local;
+    private int x;
 
-    Context context;
+    @SuppressLint("StaticFieldLeak")
+    private final Context context;
     private final WeakReference <TextView> mTextView;
     FusedLocationProviderClient fusedLocationProviderClient;
     Geocoder geocoder;
-    private LocationCallback locationCallback;
     Location location1;
     String resultMesage = "";
     List <Address> addresses = null;
 
     public interface AsyncResponse {
-        void processFinish(String kabupaten, String provinsi, String s);
+        void processFinish(String kabupaten, String provinsi, String local, String s);
     }
 
     public AsyncResponse listener;
@@ -63,7 +63,7 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
         lokasi = "Tidak ada Lokasi";
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
-        String bestProvider = String.valueOf(locationManager.getBestProvider(criteria, true)).toString();
+        String bestProvider = String.valueOf(locationManager.getBestProvider(criteria, true));
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
             @SuppressLint("DefaultLocale")
             @Override
@@ -82,7 +82,7 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
             Thread.sleep(2 * 1000);
         }
         catch (InterruptedException e){
-            e.printStackTrace();
+            Log.e(TAG, e.toString());
         }
         if (location1 == null){
             return "Lokasi Tidak Dapat Ditemukan, Silahkan Keluar dan Kembali Beberapa Saat Lagi";
@@ -119,9 +119,9 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
                 System.out.println("alamat lengkap " + resultMesage);
                 kabupaten = address.getSubAdminArea();
                 provinsi = address.getAdminArea();
-                String local = address.getLocality();
+                local = address.getLocality();
                 String sublocal = address.getSubLocality();
-                System.out.println( "Subadmin = " + kabupaten + " Admin Area = " + provinsi + " local = " + local + " sub local = " + sublocal);
+                System.out.println( "Subadmin = " + kabupaten + "; Admin Area = " + provinsi + "; local = " + local + "; sub local = " + sublocal);
                 lokasi = kabupaten + ", " + provinsi;
             }
         }
@@ -133,6 +133,6 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
     protected void onPostExecute(String s) {
         System.out.println(lokasi + " final");
         super.onPostExecute(s);
-        listener.processFinish(kabupaten, provinsi, s);
+        listener.processFinish(kabupaten, provinsi, local, s);
     }
 }

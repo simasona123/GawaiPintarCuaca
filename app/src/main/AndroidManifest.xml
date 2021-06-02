@@ -12,8 +12,11 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <permission android:name="com.example.gpc1.permission.gpc" android:protectionLevel="normal"
-        android:label="GPC Permission"/>
+
+    <permission
+        android:name="com.example.gpc1.permission.gpc"
+        android:label="GPC Permission"
+        android:protectionLevel="normal" />
 
     <application
         android:allowBackup="true"
@@ -24,18 +27,37 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GPC1"
         tools:ignore="AllowBackup">
+        <receiver
+            android:name=".receiver.ReceiverPerubahanJaringan"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.example.ACTION"/>
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".background.PengirimanDataService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver
+            android:name=".receiver.ReceiverPengirimanData"
+            android:enabled="true"
+            android:exported="false" />
+
         <activity android:name=".Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <receiver
-            android:name=".MyReceiver"
+            android:name=".receiver.ReceiverPerekamanData"
             android:enabled="true"
-            android:exported="false">
-        </receiver>
+            android:exported="false" />
 
         <service
             android:name=".background.IntentServicePerekamanData"
@@ -49,11 +71,14 @@
         <service
             android:name=".SendData"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <activity android:name=".menus.LogActivity" />
         <activity android:name=".menus.AboutUs" />
-        <activity android:name=".menus.SensorActivity" />
-        <activity android:name=".menus.MainActivity"
+        <activity android:name=".menus.SensorActivity"
             android:launchMode="singleTask"/>
+        <activity
+            android:name=".menus.MainActivity"
+            android:launchMode="singleTask" />
     </application>
 
 </manifest>

@@ -2,6 +2,7 @@ package com.example.gpc1.background;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.util.Xml;
 
 import com.example.gpc1.Constants;
@@ -20,22 +21,24 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class XMLParsingTask extends AsyncTask <Void, Void, String> {
-
+    private final String TAG = "XMLParsing Task";
     private URL url;
 
     private String kabupaten;
     private final String provinsi;
+    private String local;
     String alamatLinkProvinsi;
     Date waktu;
     private final String datePattern = "yyyyMMddHHmm";
     @SuppressLint("SimpleDateFormat")
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern);
 
-    private ArrayList<Integer> kelembaban = new ArrayList<>();
-    private ArrayList<Float> suhu = new ArrayList<>();
-    private ArrayList<Integer> kodeCuaca = new ArrayList<>();
-    private ArrayList<Date> waktuCuaca = new ArrayList<>();
-
+    private final ArrayList<Integer> kelembaban = new ArrayList<>();
+    private final ArrayList<Float> suhu = new ArrayList<>();
+    private final ArrayList<Integer> kodeCuaca = new ArrayList<>();
+    private final ArrayList<Date> waktuCuaca = new ArrayList<>();
+    private String tagName;
+    private int tagEventType;
     int x;
 
     XMLParsingTaskResponses listener;
@@ -44,10 +47,11 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
         void processFinish (ArrayList <Integer> kelembaban, ArrayList<Float> suhu, ArrayList<Integer> kodeCuaca, ArrayList<Date> waktucuaca,String s);
     }
 
-    public XMLParsingTask(XMLParsingTaskResponses listener, String kabupaten1, String provinsi1) {
+    public XMLParsingTask(XMLParsingTaskResponses listener, String kabupaten1, String provinsi1, String local) {
         this.kabupaten = kabupaten1;
         this.provinsi = provinsi1;
         this.listener = listener;
+        this.local = local;
     }
 
     @Override
@@ -56,7 +60,7 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
             alamatLinkProvinsi = Constants.alamatXml.get(provinsi);
         }
         catch(Exception e){
-            System.out.println("Alamat LinkXml Null");
+            Log.e(TAG, "Tidak AlamatLink XML");
         }
         waktu = Calendar.getInstance().getTime();
         if (kabupaten == null || alamatLinkProvinsi == null) {
@@ -65,6 +69,7 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
         }
         else{
             kabupaten = kabupaten.toLowerCase();
+            local = local.toLowerCase();
             System.out.println(kabupaten);
         }
         try {
@@ -73,7 +78,7 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
             url = new URL(alamatLinkProvinsi);
         }
         catch (MalformedURLException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.toString());
         }
         try{
             XmlPullParser xmlPullParser = Xml.newPullParser();
@@ -86,8 +91,8 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
             xmlPullParser.setInput(inputStream, "UTF-8");
             xmlPullParser.nextTag();
             xmlPullParser.nextTag();
-            String tagName = xmlPullParser.getName();
-            int tagEventType = xmlPullParser.getEventType();
+            tagName = xmlPullParser.getName();
+            tagEventType = xmlPullParser.getEventType();
             while (xmlPullParser.next()!= xmlPullParser.END_TAG){
                 if (xmlPullParser.getEventType() != xmlPullParser.START_TAG){
                     continue;
@@ -97,7 +102,7 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
                 if (tagName.equals("area")){
                     String description = xmlPullParser.getAttributeValue(null, "description");
                     description = description.toLowerCase();
-                    if(kabupaten.contains(description)){
+                    if(kabupaten.contains(description) || local.contains(description)){
                         while(xmlPullParser.next() != XmlPullParser.END_TAG){
                             if (xmlPullParser.getEventType() != xmlPullParser.START_TAG){
                                 continue;
@@ -233,7 +238,7 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
             }
         }
         catch (XmlPullParserException | IOException | ParseException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.toString());
         }
         return "Berhasil";
     }
@@ -265,6 +270,7 @@ public class XMLParsingTask extends AsyncTask <Void, Void, String> {
         try {
             return url.openConnection().getInputStream();
         } catch (IOException ioException) {
+            Log.e(TAG, "Error Input Stram");
             ioException.printStackTrace();
             return null;
         }

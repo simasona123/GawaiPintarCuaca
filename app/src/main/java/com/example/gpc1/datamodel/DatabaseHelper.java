@@ -1,33 +1,44 @@
-package com.example.gpc1;
+package com.example.gpc1.datamodel;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
+
+import com.example.gpc1.Preferences;
+import com.example.gpc1.datamodel.DataModel;
+import com.example.gpc1.datamodel.DataModel1;
 
 import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    public static final String TABLE_DB = "gpcTable";
+    private static final String TABLE_DB = "gpcTable";
 
-    public static final String COLUMN_DataID = "DataID";
-    public static final String COLUMN_TIME_STAMP = "timestamp";
-    public static final String COLUMN_LATITUDE = "latitude";
-    public static final String COLUMN_LONGITUDE = "longitude";
-    public static final String COLUMN_ALTITUDE = "altitude";
+    private static final String COLUMN_DataID = "DataID";
+    private static final String COLUMN_TIME_STAMP = "timestamp";
+    private static final String COLUMN_LATITUDE = "latitude";
+    private static final String COLUMN_LONGITUDE = "longitude";
+    private static final String COLUMN_ALTITUDE = "altitude";
     private static final String COLUMN_ALTITUDE1 = "altitude1" ;
-    public static final String COLUMN_SUHU_UDARA = "suhu_udara";
-    public static final String COLUMN_KELEMBABAN_UDARA = "kelembaban_udara";
-    public static final String COLUMN_SUHU_BATERAI = "suhu_baterai";
-    public static final String COLUMN_TEKANAN_UDARA = "tekanan_udara";
-    public static final String COLUMN_CPU_TEMPERATURE = "suhu_cpu";
-    public static final String COLUMN_DIKIRIM = "Dikirim";
-    public static final String COLUMNSTATUS_LAYAR = "status_layar";
-    public static final String COLUMN_STATUS_BATERAI = "status_charging";
+    private static final String COLUMN_SUHU_UDARA = "suhu_udara";
+    private static final String COLUMN_KELEMBABAN_UDARA = "kelembaban_udara";
+    private static final String COLUMN_SUHU_BATERAI = "suhu_baterai";
+    private static final String COLUMN_TEKANAN_UDARA = "tekanan_udara";
+    private static final String COLUMN_CPU_TEMPERATURE = "suhu_cpu";
+    private static final String COLUMN_DIKIRIM = "Dikirim";
+    private static final String COLUMNSTATUS_LAYAR = "status_layar";
+    private static final String COLUMN_STATUS_BATERAI = "status_charging";
+
+    private static final String TABLE_Scheduling = "schedulingTable";
+    private static final String COLUMN_SCHEDULING_ID = "id";
+    private static final String COLUMN_SCHEDULING_TIMESTAMP = "timestamp";
+    private static final String COLUMN_RESULT = "result";
 
 
     public DatabaseHelper(@Nullable Context context) {
@@ -52,7 +63,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMNSTATUS_LAYAR + " BOOLEAN, " +
                 COLUMN_STATUS_BATERAI + " BOOLEAN" +
                 ");";
+        String createTable1 = "CREATE TABLE " + TABLE_Scheduling + "(" +
+                COLUMN_SCHEDULING_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                COLUMN_SCHEDULING_TIMESTAMP + " TEXT NOT NULL UNIQUE, " +
+                COLUMN_RESULT + " TEXT NOT NULL);";
         db.execSQL(createTable);
+        db.execSQL(createTable1);
+        System.out.println("Pembuatan Tabel");
+    }
+    public boolean addData1 (DataModel1 dataModel1){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COLUMN_SCHEDULING_TIMESTAMP, dataModel1.getTimestamp());
+        cv.put(COLUMN_RESULT, dataModel1.getResult());
+        long insert = db.insert(TABLE_Scheduling, null, cv);
+        db.close();
+        return insert != -1;
     }
 
     public boolean addData (DataModel dataModel){
@@ -83,7 +109,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery(SQLStatement, null);
         if(cursor.moveToFirst()){
-            System.out.println(cursor);
             do{
                 int id = cursor.getInt(0);
                 String timeStamp = cursor.getString(1);
@@ -109,13 +134,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return returnList;
     }
 
-    public ArrayList<DataModel> getUnsendingData(){
+    public ArrayList<DataModel> getUnsendingData(Context context){
         ArrayList<DataModel> returnList= new ArrayList<>();
-        String sqlQuery = "SELECT * FROM "+ TABLE_DB +" WHERE " + COLUMN_DIKIRIM + " = 0 LIMIT 35;";
+        int limit = 35;
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Preferences.SHARED_PRE_FILE, Context.MODE_PRIVATE);
+        limit = limit * sharedPreferences.getInt(Preferences.SCHEDULING_COUNT, 0);
+        String sqlQuery = "SELECT * FROM "+ TABLE_DB +" WHERE " + COLUMN_DIKIRIM + " = 0 LIMIT " + limit + ";";
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery(sqlQuery, null);
         if(cursor.moveToFirst()){
-            System.out.println(cursor);
             do{
                 int id = cursor.getInt(0);
                 String timeStamp = cursor.getString(1);
@@ -142,7 +169,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+//        db.execSQL("DROP TABLE IF EXISTS '" + TABLE_DB + "'");
+//        db.execSQL("DROP TABLE IF EXISTS '" + TABLE_Scheduling + "'");
+        onCreate(db);
     }
 
     public boolean updateStatusKirim(DataModel dataModel){

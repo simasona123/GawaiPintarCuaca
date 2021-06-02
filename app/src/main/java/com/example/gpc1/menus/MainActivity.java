@@ -42,7 +42,7 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     private static final String LOG_TAG = "MainActivity";
     private static final int REQUEST_LOCATION_PERMISSION = 1;
 
-    String provinsi, kabupaten;
+    String provinsi, kabupaten, local;
 
     @SuppressLint("SimpleDateFormat")
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy HH:mm");
@@ -63,7 +63,6 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     String lokasi;
 
     private SharedPreferences sharedPreferences;
-    private final Preferences preferences = new Preferences();
     private final String sharedPrefFile = Preferences.SHARED_PRE_FILE;
 
     @SuppressLint({"MissingPermission", "SetTextI18n"})
@@ -115,12 +114,15 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
     protected void onStart() {
         super.onStart();
         sharedPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
+        SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
+//        preferencesEditor.putInt(Preferences.SCHEDULING_COUNT, 0);//TODO jangan lupa dihapus
+//        preferencesEditor.apply();
         if (sharedPreferences.getString(Preferences.KEY_UUID, null) == null){
             String uuID = UUID.randomUUID().toString();
-            SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
             preferencesEditor.putString(Preferences.KEY_UUID, uuID);
             preferencesEditor.putString(Preferences.MODEL, Build.MODEL);
             preferencesEditor.putString(Preferences.VERSION_RELEASE, Build.VERSION.RELEASE);
+            preferencesEditor.putInt(Preferences.SCHEDULING_COUNT, 0);
             preferencesEditor.apply();
         }
     }
@@ -130,15 +132,16 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
 
     }
     @Override
-    public void processFinish(String kabupaten, String provinsi, String lokasi) {
+    public void processFinish(String kabupaten, String provinsi, String local, String lokasi) {
         try{
             this.kabupaten = kabupaten;
             this.provinsi = provinsi;
             this.lokasi = lokasi;
+            this.local = local;
             lokasiMainTextView.setText(lokasi);
             ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             if(cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected()){
-                new XMLParsingTask(this, kabupaten, provinsi).execute();
+                new XMLParsingTask(this, kabupaten, provinsi, local).execute();
             }
             else{
                 Toast.makeText(this, "Butuh Koneksi Internet", Toast.LENGTH_SHORT).show();
@@ -184,7 +187,7 @@ public class MainActivity extends Activity implements BottomNavigationView.OnNav
         if ((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 + ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 + ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) != PackageManager.PERMISSION_GRANTED
-        && sharedPreferences.getInt("Permisi", 0) != 1){
+                && sharedPreferences.getInt("Permisi", 0) != 1){
             SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
             preferencesEditor.putInt("Permisi", 1);
             preferencesEditor.apply();
