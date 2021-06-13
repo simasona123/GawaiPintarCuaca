@@ -14,6 +14,7 @@ import android.util.Log;
 
 import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.ExistingWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
@@ -49,28 +50,28 @@ public class ReceiverPerubahanJaringan extends BroadcastReceiver {
     }
 
     private void createScheduler (Context context){
-//        Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
-//        WorkRequest myWorkRequest = new OneTimeWorkRequest.Builder(WorkerClass.class).setConstraints(constraints).build();
-//        WorkManager.getInstance().enqueue(myWorkRequest);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            JobScheduler jobScheduler;
-            jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            ComponentName serviceName = new ComponentName(context.getPackageName(), SendData.class.getName());
-            JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, serviceName);
-            builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-            JobInfo jobInfo = builder.build();
-            int resultCode = jobScheduler.schedule(jobInfo);
-            if(resultCode <= 0){
-                System.out.println("Job Scheduler Gagal");
-            }
-            else{
-                System.out.println("Job Scheduler Berhasil");
-            }
-        }
-        else {
-            Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
-            WorkRequest myWorkRequest = new OneTimeWorkRequest.Builder(WorkerClass.class).setConstraints(constraints).build();
-            WorkManager.getInstance().enqueue(myWorkRequest);
-        }
+        Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
+        WorkRequest myWorkRequest = new OneTimeWorkRequest.Builder(WorkerClass.class).setConstraints(constraints).build();
+        WorkManager.getInstance().enqueueUniqueWork("Worker Pengiriman Data", ExistingWorkPolicy.REPLACE, (OneTimeWorkRequest) myWorkRequest);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            JobScheduler jobScheduler;
+//            jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+//            ComponentName serviceName = new ComponentName(context.getPackageName(), SendData.class.getName());
+//            JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, serviceName);
+//            builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+//            JobInfo jobInfo = builder.build();
+//            int resultCode = jobScheduler.schedule(jobInfo);
+//            if(resultCode <= 0){
+//                System.out.println("Job Scheduler Gagal");
+//            }
+//            else{
+//                System.out.println("Job Scheduler Berhasil");
+//            }
+//        }
+//        else {
+//            Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
+//            WorkRequest myWorkRequest = new OneTimeWorkRequest.Builder(WorkerClass.class).setConstraints(constraints).build();
+//            WorkManager.getInstance().enqueue(myWorkRequest);
+//        }
     }
 }

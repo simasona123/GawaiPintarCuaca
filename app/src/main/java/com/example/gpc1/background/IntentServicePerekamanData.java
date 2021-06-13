@@ -211,7 +211,9 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
             if (userMaks == 0 || userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
                 createJobScheduler();
             }
-
+            else{
+                createJobScheduler();
+            }
             }
         else{
             dataRekaman.setAltitude1(sharedPreferences.getFloat(Preferences.ALT1_RECENTLY, 0f));
@@ -219,6 +221,9 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
             notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
             sensorManager.unregisterListener(IntentServicePerekamanData.this);
             if (userMaks == 0 || userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
+                createJobScheduler();
+            }
+            else {
                 createJobScheduler();
             }
             stopService(intent);
@@ -244,7 +249,6 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
                 preferencesEditor.putFloat(Preferences.ALT1_RECENTLY, (float)altitude1);
                 preferencesEditor.apply();
                 notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
-                System.out.println(dataRekaman.toString());
                 stopService(intent);
             }
             catch (JSONException e) {
@@ -256,7 +260,6 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
             System.out.println("Error API");
             databaseHelper.addData(dataRekaman);
             notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
-            System.out.println(dataRekaman.toString());
             stopService(intent);
         });
         requestQueue.add(request); //TODO Jangan dihapus/diubah

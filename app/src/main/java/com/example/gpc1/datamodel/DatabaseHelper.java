@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteTableLockedException;
@@ -69,20 +70,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_RESULT + " TEXT NOT NULL);";
         db.execSQL(createTable);
         db.execSQL(createTable1);
-        System.out.println("Pembuatan Tabel");
     }
-    public boolean addData1 (DataModel1 dataModel1){
+
+    public boolean addData1 (DataModel1 dataModel1){ //TODO Jadwal Pengiriman
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_SCHEDULING_TIMESTAMP, dataModel1.getTimestamp());
         cv.put(COLUMN_RESULT, dataModel1.getResult());
-        long insert = db.insert(TABLE_Scheduling, null, cv);
+        long insert = -1;
+        try {
+            insert = db.insert(TABLE_Scheduling, null, cv);
+        }
+        catch (SQLiteConstraintException e){
+            e.printStackTrace();
+        }
         db.close();
         return insert != -1;
     }
 
     public boolean addData (DataModel dataModel){
-
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_TIME_STAMP, dataModel.getTimeStamp());
@@ -204,4 +210,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return 0;
     }
+
 }

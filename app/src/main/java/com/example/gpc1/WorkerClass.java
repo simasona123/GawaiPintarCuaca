@@ -46,7 +46,7 @@ public class WorkerClass extends Worker {
         databaseHelper = new DatabaseHelper(context);
         sharedPreferences = context.getSharedPreferences(Preferences.SHARED_PRE_FILE, Context.MODE_PRIVATE);
         prepareSendData();
-        new Handler().postDelayed(() -> System.out.println("Worker Run"), 5000);
+//        new Handler().postDelayed(() -> System.out.println("Worker Run"), 5000);
         Log.i("Coba Worker", "Berhasil");
         return Result.success();
     }
