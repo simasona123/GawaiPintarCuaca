@@ -6,13 +6,12 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -68,7 +67,6 @@ public class PengirimanDataService extends Service {
             preferencesEditor1.putInt("Jaringan", 0);
             preferencesEditor1.apply();
         }
-        SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
         unsendingData = new ArrayList<>();
         unsendingData = databaseHelper.getUnsendingData(this);
         JSONArray jsonArray = new JSONArray();
@@ -137,14 +135,18 @@ public class PengirimanDataService extends Service {
             System.out.println("User ID = " + sharedPreferences.getInt(Preferences.ID_USER,0));
             stopService(intent);
         }, error -> {
-            Intent intent1 = new Intent("com.example.ACTION");
-            PackageManager packageManager = getPackageManager();
-            List<ResolveInfo> infos = packageManager.queryBroadcastReceivers(intent1, 0);
-            for (ResolveInfo info:infos){
-                ComponentName componentName = new ComponentName(info.activityInfo.packageName, info.activityInfo.name);
-                intent1.setComponent(componentName);
-                sendBroadcast(intent1);
-            }
+            Intent intent1 = new Intent(PengirimanDataService.this, ReceiverPerubahanJaringan.class);
+            intent1.setAction("com.example.gpc1.ACTION");
+            ComponentName componentName = new ComponentName(getApplicationContext().getPackageName(), "com.example.gpc1.receiver.ReceiverPerubahanJaringan");
+            intent1.setComponent(componentName);
+//            PackageManager packageManager = getPackageManager();
+//            List<ResolveInfo> infos = packageManager.queryBroadcastReceivers(intent1, 0);
+//            for (ResolveInfo info:infos){
+//                ComponentName componentName = new ComponentName(info.activityInfo.packageName, info.activityInfo.name);
+//                intent1.setComponent(componentName);
+//                sendBroadcast(intent1);
+//            }
+            sendBroadcast(intent1);
             Log.i("Pengiriman Data", "Gagal " + error);
             notificationGPC.deliverNotification("Pengiriman Data Gagal");
             Calendar calendar = Calendar.getInstance();

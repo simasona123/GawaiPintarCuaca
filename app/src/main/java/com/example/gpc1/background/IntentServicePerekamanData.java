@@ -197,6 +197,8 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
         sharedPreferences = getSharedPreferences(Preferences.SHARED_PRE_FILE, MODE_PRIVATE);
         float selisihLat = Math.abs(sharedPreferences.getFloat(Preferences.LAT_RECENTLY, 1f) - (float)latitude);
         float selisihLong = Math.abs(sharedPreferences.getFloat(Preferences.LONG_RECENTLY, 1f) - (float)longitude);
+        int userMaks = sharedPreferences.getInt(Preferences.USER_MAKS, 0);
+        int userID = sharedPreferences.getInt(Preferences.ID_USER,0);
         if (sharedPreferences.getFloat(Preferences.LAT_RECENTLY, 1f) == 1f ||
                 sharedPreferences.getFloat(Preferences.LONG_RECENTLY, 1f) == 1f ||
                 selisihLat >= 0.0002f || selisihLong >= 0.0002f ||
@@ -206,13 +208,19 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
             preferencesEditor.putFloat(Preferences.LAT_RECENTLY, (float)latitude);
             preferencesEditor.putFloat(Preferences.LONG_RECENTLY, (float)longitude);
             preferencesEditor.apply();
-        }
+            if (userMaks == 0 || userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
+                createJobScheduler();
+            }
+
+            }
         else{
             dataRekaman.setAltitude1(sharedPreferences.getFloat(Preferences.ALT1_RECENTLY, 0f));
             databaseHelper.addData(dataRekaman);
             notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
             sensorManager.unregisterListener(IntentServicePerekamanData.this);
-            createJobScheduler();
+            if (userMaks == 0 || userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
+                createJobScheduler();
+            }
             stopService(intent);
         }
 
@@ -237,7 +245,6 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
                 preferencesEditor.apply();
                 notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
                 System.out.println(dataRekaman.toString());
-                createJobScheduler();
                 stopService(intent);
             }
             catch (JSONException e) {
@@ -250,7 +257,6 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
             databaseHelper.addData(dataRekaman);
             notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
             System.out.println(dataRekaman.toString());
-            createJobScheduler();
             stopService(intent);
         });
         requestQueue.add(request); //TODO Jangan dihapus/diubah
@@ -263,25 +269,19 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
         AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
         long milis = calendar.getTimeInMillis();
-        SharedPreferences sharedPreferences = getSharedPreferences(Preferences.SHARED_PRE_FILE, MODE_PRIVATE);
-        int userMaks = sharedPreferences.getInt(Preferences.USER_MAKS, 0);
-        int userID = sharedPreferences.getInt(Preferences.ID_USER,0);
-        if (userMaks == 0 || userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
-            System.out.println("IntentService => Memulai Pengiriman Data Awal");
-            if (Build.VERSION.SDK_INT >= 19) {
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP, milis, sendingDataPendingIntent);
-            }
-            else{
-                alarmManager.set(AlarmManager.RTC_WAKEUP, milis, sendingDataPendingIntent);
-            }
+        System.out.println("IntentService => Memulai Pengiriman Data Awal");
+        if (Build.VERSION.SDK_INT >= 19) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, milis + 10000, sendingDataPendingIntent);
         }
-        System.out.println("User Maks = " + userMaks);
-        System.out.println("User ID = " + userID);
+        else{
+            alarmManager.set(AlarmManager.RTC_WAKEUP, milis + 10000, sendingDataPendingIntent);
+        }
     }
-    private long alarm(int userMaks, int userID, Calendar calendar, long milis){
+
+    private long alarm(int userMaks, int userID, Calendar calendar){
         System.out.println("IntentService => Memulai Pengiriman Data Tidak Awal");
-        System.out.println("User Maks = " + sharedPreferences.getInt(Preferences.USER_MAKS,0));
-        System.out.println("User ID = " + sharedPreferences.getInt(Preferences.ID_USER,0));
+        System.out.println("User Maks = " + String.valueOf(userMaks));
+        System.out.println("User ID = " + String.valueOf(userID));
         int n = (userMaks / 25 + 1) * 24;
         float t = ((float)24 / n ) * userID;
         float totalMenit = t * 60;
@@ -296,7 +296,7 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
         calendar.set(Calendar.HOUR_OF_DAY, jam);
         calendar.set(Calendar.MINUTE, menit);
         calendar.set(Calendar.SECOND, 0);
-        milis = calendar.getTimeInMillis();
+        long milis = calendar.getTimeInMillis();
         System.out.print("Alarm => ");
         System.out.print(", " + calendar.get(Calendar.DAY_OF_YEAR));
         System.out.print(" or " + calendar.get(Calendar.DATE));
@@ -304,6 +304,7 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
         System.out.println(", " + calendar.get(Calendar.MINUTE));
         return milis;
     }
+
     private long tes(long milis){
         long x = milis % (60 * 1000 * Constants.PERIODE_REKAMAN_MENIT);
         milis  = milis + (60 * 1000 * Constants.PERIODE_REKAMAN_MENIT) - x;

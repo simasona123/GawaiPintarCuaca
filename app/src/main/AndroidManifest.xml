@@ -32,7 +32,7 @@
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.example.ACTION"/>
+                <action android:name="com.example.gpc1.ACTION"/>
             </intent-filter>
         </receiver>
 

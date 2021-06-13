@@ -4,16 +4,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
+import android.database.sqlite.SQLiteTableLockedException;
 
 import androidx.annotation.Nullable;
 
 import com.example.gpc1.Preferences;
-import com.example.gpc1.datamodel.DataModel;
-import com.example.gpc1.datamodel.DataModel1;
 
+import java.sql.SQLInput;
 import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -47,7 +47,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createTable = "CREATE TABLE " + TABLE_DB + " (" +
+        String createTable = "CREATE TABLE IF NOT EXISTS " + TABLE_DB + " (" +
                 COLUMN_DataID + " INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL, " +
                 COLUMN_TIME_STAMP + " TEXT NOT NULL UNIQUE, " +
                 COLUMN_LATITUDE + " REAL, " +
@@ -63,7 +63,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMNSTATUS_LAYAR + " BOOLEAN, " +
                 COLUMN_STATUS_BATERAI + " BOOLEAN" +
                 ");";
-        String createTable1 = "CREATE TABLE " + TABLE_Scheduling + "(" +
+        String createTable1 = "CREATE TABLE IF NOT EXISTS " + TABLE_Scheduling + "(" +
                 COLUMN_SCHEDULING_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                 COLUMN_SCHEDULING_TIMESTAMP + " TEXT NOT NULL UNIQUE, " +
                 COLUMN_RESULT + " TEXT NOT NULL);";
@@ -194,4 +194,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.update(TABLE_DB, cv, COLUMN_DataID + " = " + dataModel.getId(), null) > 0;
     }
 
+    public int hapusData(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        long count = DatabaseUtils.queryNumEntries(db, TABLE_DB);
+        db.close();
+        if (count > 10){
+            SQLiteDatabase db1 = this.getWritableDatabase();
+            return db1.delete(TABLE_DB, null, null);
+        }
+        return 0;
+    }
 }
