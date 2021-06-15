@@ -211,9 +211,9 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
             if (userMaks == 0 || userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
                 createJobScheduler();
             }
-            else{
-                createJobScheduler();
-            }
+//            else{
+//                createJobScheduler(); //TODO Pengujian silahkan uncomment
+//            }
             }
         else{
             dataRekaman.setAltitude1(sharedPreferences.getFloat(Preferences.ALT1_RECENTLY, 0f));
@@ -223,9 +223,9 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
             if (userMaks == 0 || userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
                 createJobScheduler();
             }
-            else {
-                createJobScheduler();
-            }
+//            else {
+//                createJobScheduler();  //TODO Jika ingin pengujian silahkan uncomment
+//            }
             stopService(intent);
         }
 
@@ -281,38 +281,39 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
         }
     }
 
-    private long alarm(int userMaks, int userID, Calendar calendar){
-        System.out.println("IntentService => Memulai Pengiriman Data Tidak Awal");
-        System.out.println("User Maks = " + String.valueOf(userMaks));
-        System.out.println("User ID = " + String.valueOf(userID));
-        int n = (userMaks / 25 + 1) * 24;
-        float t = ((float)24 / n ) * userID;
-        float totalMenit = t * 60;
-        int jam = (int) totalMenit / 60;
-        int menit = (int) totalMenit % 60;
-        System.out.println(t);
-        System.out.println(jam);
-        System.out.println(menit);
-        if (calendar.get(Calendar.HOUR_OF_DAY) >= jam) {
-            calendar.add(Calendar.DAY_OF_YEAR, 1);
-        }
-        calendar.set(Calendar.HOUR_OF_DAY, jam);
-        calendar.set(Calendar.MINUTE, menit);
-        calendar.set(Calendar.SECOND, 0);
-        long milis = calendar.getTimeInMillis();
-        System.out.print("Alarm => ");
-        System.out.print(", " + calendar.get(Calendar.DAY_OF_YEAR));
-        System.out.print(" or " + calendar.get(Calendar.DATE));
-        System.out.print(", " + calendar.get(Calendar.HOUR_OF_DAY));
-        System.out.println(", " + calendar.get(Calendar.MINUTE));
-        return milis;
-    }
-
-    private long tes(long milis){
-        long x = milis % (60 * 1000 * Constants.PERIODE_REKAMAN_MENIT);
-        milis  = milis + (60 * 1000 * Constants.PERIODE_REKAMAN_MENIT) - x;
-        return milis;
-    }
+//    private long alarm(int userMaks, int userID, Calendar calendar){
+//        System.out.println("IntentService => Memulai Pengiriman Data Tidak Awal");
+//        System.out.println("User Maks = " + userMaks);
+//        System.out.println("User ID = " + userID);
+//        int n = (userMaks / 25 + 1) * 24;
+//        float t = ((float)24 / n ) * userID;
+//        float totalMenit = t * 60;
+//        int jam = (int) totalMenit / 60;
+//        int menit = (int) totalMenit % 60;
+//        System.out.println(t);
+//        System.out.println(jam);
+//        System.out.println(menit);
+//        if (calendar.get(Calendar.HOUR_OF_DAY) >= jam) {
+//            calendar.add(Calendar.DAY_OF_YEAR, 1);
+//        }
+//        calendar.set(Calendar.HOUR_OF_DAY, jam);
+//        calendar.set(Calendar.MINUTE, menit);
+//        calendar.set(Calendar.SECOND, 0);
+//        long milis = calendar.getTimeInMillis();
+//        System.out.print("Alarm => ");
+//        System.out.print(", " + calendar.get(Calendar.DAY_OF_YEAR));
+//        System.out.print(" or " + calendar.get(Calendar.DATE));
+//        System.out.print(", " + calendar.get(Calendar.HOUR_OF_DAY));
+//        System.out.println(", " + calendar.get(Calendar.MINUTE));
+//        return milis;
+//    }
+//
+//    private long tes(long milis){
+//        long x = milis % (60 * 1000 * Constants.PERIODE_REKAMAN_MENIT);
+//        milis  = milis + (60 * 1000 * Constants.PERIODE_REKAMAN_MENIT) - x;
+//        return milis;
+//    }
+//TODO Tidak diperlukan untuk di sini
 
     private boolean statusBaterai(Intent intent) {
         int baterai = intent.getIntExtra("statusBaterai", -1);

@@ -204,9 +204,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         long count = DatabaseUtils.queryNumEntries(db, TABLE_DB);
         db.close();
-        if (count > 10){
+        if (count > 3){
             SQLiteDatabase db1 = this.getWritableDatabase();
-            return db1.delete(TABLE_DB, null, null);
+            return db1.delete(TABLE_DB, COLUMN_DIKIRIM + "?", new String[]{"0",});
         }
         return 0;
     }

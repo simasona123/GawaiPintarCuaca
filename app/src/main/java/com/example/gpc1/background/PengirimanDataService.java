@@ -130,9 +130,7 @@ public class PengirimanDataService extends Service {
             preferencesEditor.putInt(Preferences.ID_USER, userID);
             preferencesEditor.putInt(Preferences.SCHEDULING_COUNT, 0);
             preferencesEditor.apply();
-            System.out.println("Pengiriman Data Service");
-            System.out.println("User Maks = " + sharedPreferences.getInt(Preferences.USER_MAKS,0));
-            System.out.println("User ID = " + sharedPreferences.getInt(Preferences.ID_USER,0));
+            databaseHelper.hapusData();
             stopService(intent);
         }, error -> {
             Intent intent1 = new Intent(PengirimanDataService.this, ReceiverPerubahanJaringan.class);

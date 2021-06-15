@@ -45,22 +45,22 @@ public class ReceiverPengirimanData extends BroadcastReceiver {
         int userMaks = sharedPreferences.getInt(Preferences.USER_MAKS, 0);
         int userID = sharedPreferences.getInt(Preferences.ID_USER, 0);
         if (userMaks != 0 || userID != 0) {
-            // milis = alarm(userMaks, userID, calendar, milis);
-            milis = tes(milis);
+             milis = alarm(userMaks, userID, calendar, milis); //TODO untuk production
+//           milis = tes(milis);  //TODO untuk pengujian
             if (Build.VERSION.SDK_INT >= 19) {
                 alarmManager.setExact(AlarmManager.RTC_WAKEUP, milis, sendingDataPendingIntent);
             } else {
                 alarmManager.set(AlarmManager.RTC_WAKEUP, milis, sendingDataPendingIntent);
             }
         }
-        else {
-            milis = tes(milis);
-            if (Build.VERSION.SDK_INT >= 19) {
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP, milis, sendingDataPendingIntent);
-            } else {
-                alarmManager.set(AlarmManager.RTC_WAKEUP, milis, sendingDataPendingIntent);
-            }
-        }
+//        else {
+//            milis = tes(milis);
+//            if (Build.VERSION.SDK_INT >= 19) {
+//                alarmManager.setExact(AlarmManager.RTC_WAKEUP, milis, sendingDataPendingIntent); //TODO untuk Pengujian
+//            } else {
+//                alarmManager.set(AlarmManager.RTC_WAKEUP, milis, sendingDataPendingIntent);
+//            }
+//        }
     }
     private long alarm(int userMaks, int userID, Calendar calendar, long milis){
         System.out.println("IntentService => Memulai Pengiriman Data Tidak Awal");

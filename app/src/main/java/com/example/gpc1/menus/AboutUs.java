@@ -32,7 +32,7 @@ public class AboutUs extends Activity implements BottomNavigationView.OnNavigati
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         TextView linkWeb = (TextView) findViewById(R.id.linkWeb);
         linkWeb.setMovementMethod(LinkMovementMethod.getInstance());
-        String linkWebText = "<a href='http://www.google.com'>Lihat Data</a>";
+        String linkWebText = "<a href='http://gawaipintarcuaca.online'>Lihat Data</a>";
         if(Build.VERSION.SDK_INT >= 24){
             linkWeb.setText(Html.fromHtml(linkWebText, Html.FROM_HTML_MODE_COMPACT));
         }
@@ -53,7 +53,7 @@ public class AboutUs extends Activity implements BottomNavigationView.OnNavigati
         sharedPreferences = getSharedPreferences(preferences.SHARED_PRE_FILE, MODE_PRIVATE);
         System.out.println(sharedPreferences.getString(preferences.MODEL, null)+ "  " + sharedPreferences.getString(preferences.VERSION_RELEASE, null));
         String key_UUID = sharedPreferences.getString("key_UUID", null);
-        String linkEmailText= "<a href=\"mailto: boma.anjang.pertala@stmkg.ac.id?subject= "+ key_UUID +"&body=Tulis Kritik atau Saran" +
+        String linkEmailText= "<a href=\"mailto: gawaipintarcuaca@gmail.com?subject= "+ key_UUID +"&body=Tulis Kritik atau Saran" +
                 " \">Send Feedback</a>";
         if(Build.VERSION.SDK_INT >= 24){
             linkEmail.setText(Html.fromHtml(linkEmailText, Html.FROM_HTML_MODE_COMPACT));
@@ -63,7 +63,7 @@ public class AboutUs extends Activity implements BottomNavigationView.OnNavigati
         }
         TextView linkGithub = (TextView) findViewById(R.id.linkGithub);
         linkGithub.setMovementMethod(LinkMovementMethod.getInstance());
-        String linkGithubText= "<a href=\"https://github.com/simasona123/Skripsi\">Source Code</a>";
+        String linkGithubText= "<a href=\"https://github.com/simasona123/GawaiPintarCuaca\">Source Code</a>";
         if(Build.VERSION.SDK_INT >= 24){
             linkGithub.setText(Html.fromHtml(linkGithubText, Html.FROM_HTML_MODE_COMPACT));
         }
