@@ -1,9 +1,12 @@
     package com.example.gpc1;
 
+    import android.app.AlarmManager;
     import android.app.NotificationManager;
+    import android.app.PendingIntent;
     import android.app.job.JobParameters;
     import android.app.job.JobService;
     import android.content.Context;
+    import android.content.Intent;
     import android.content.SharedPreferences;
     import android.os.Build;
     import android.util.Log;
@@ -17,6 +20,7 @@
     import com.example.gpc1.datamodel.DataModel;
     import com.example.gpc1.datamodel.DataModel1;
     import com.example.gpc1.datamodel.DatabaseHelper;
+    import com.example.gpc1.receiver.ReceiverPengirimanData;
 
     import org.json.JSONArray;
     import org.json.JSONException;
@@ -34,7 +38,6 @@ public class SendData extends JobService {
     DatabaseHelper databaseHelper;
     ArrayList<DataModel> unsendingData;
     SharedPreferences sharedPreferences;
-    boolean jobCancelled;
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-M-dd HH:mm:ss");
 
 
@@ -108,9 +111,12 @@ public class SendData extends JobService {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            if (sharedPreferences.getInt(Preferences.ID_USER, 0) == 0) {
+                createJobScheduler();
+            }
             SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
             preferencesEditor.putInt(Preferences.USER_MAKS, userMaks);
-//            preferencesEditor.putInt(Preferences.ID_USER, userID);
+            preferencesEditor.putInt(Preferences.ID_USER, userID);
             preferencesEditor.putInt(Preferences.SCHEDULING_COUNT, 0);
             preferencesEditor.apply();
             jobFinished(params, false);
@@ -131,4 +137,20 @@ public class SendData extends JobService {
     public boolean onStopJob(JobParameters params) {
         return true;
     }
+
+        private void createJobScheduler() {
+            Intent sendingDataIntent = new Intent(this, ReceiverPengirimanData.class);
+            PendingIntent sendingDataPendingIntent = PendingIntent.getBroadcast(this, 0, sendingDataIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            Calendar calendar = Calendar.getInstance();
+            long milis = calendar.getTimeInMillis();
+            System.out.println("IntentService => Memulai Pengiriman Data Awal");
+            if (Build.VERSION.SDK_INT >= 19) {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, milis, sendingDataPendingIntent);
+            }
+            else{
+                alarmManager.set(AlarmManager.RTC_WAKEUP, milis, sendingDataPendingIntent);
+            }
+        }
 }
