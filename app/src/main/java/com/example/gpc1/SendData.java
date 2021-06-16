@@ -110,7 +110,7 @@ public class SendData extends JobService {
             }
             SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
             preferencesEditor.putInt(Preferences.USER_MAKS, userMaks);
-            preferencesEditor.putInt(Preferences.ID_USER, userID);
+//            preferencesEditor.putInt(Preferences.ID_USER, userID);
             preferencesEditor.putInt(Preferences.SCHEDULING_COUNT, 0);
             preferencesEditor.apply();
             jobFinished(params, false);

@@ -32,7 +32,6 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
     private String provinsi;
     private String altitude;
     private String local;
-    private int x;
 
     @SuppressLint("StaticFieldLeak")
     private final Context context;
@@ -49,7 +48,8 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
 
     public AsyncResponse listener;
 
-    public LocationTask(AsyncResponse listener, Context context1, Geocoder geocoder1, FusedLocationProviderClient fusedLocationProviderClient, TextView tv) {
+    public LocationTask(AsyncResponse listener, Context context1, Geocoder geocoder1,
+                        FusedLocationProviderClient fusedLocationProviderClient, TextView tv) {
         this.mTextView = new WeakReference<>(tv);
         this.fusedLocationProviderClient = fusedLocationProviderClient;
         this.geocoder = geocoder1;
@@ -69,7 +69,6 @@ public class LocationTask extends AsyncTask <Void, Void, String> {
             @Override
             public void onSuccess(Location location) {
                 if(location != null){
-                    x = 1;
                     latitude = String.format("%.4f",location.getLatitude());
                     longitude = String.format("%.4f",location.getLongitude());
                     altitude = String.valueOf(location.getAltitude());

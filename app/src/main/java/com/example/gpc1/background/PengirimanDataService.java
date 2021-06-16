@@ -1,7 +1,9 @@
 package com.example.gpc1.background;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -9,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -25,6 +28,7 @@ import com.example.gpc1.Preferences;
 import com.example.gpc1.datamodel.DataModel;
 import com.example.gpc1.datamodel.DataModel1;
 import com.example.gpc1.datamodel.DatabaseHelper;
+import com.example.gpc1.receiver.ReceiverPengirimanData;
 import com.example.gpc1.receiver.ReceiverPerubahanJaringan;
 
 import org.json.JSONArray;
@@ -69,9 +73,10 @@ public class PengirimanDataService extends Service {
         }
         unsendingData = new ArrayList<>();
         unsendingData = databaseHelper.getUnsendingData(this);
+        int dataSize = unsendingData.size();
         JSONArray jsonArray = new JSONArray();
-        Log.i("pengiriman","unsendingDataSize = " + unsendingData.size());
-        for (int i = 0; i < unsendingData.size(); i++) {
+        Log.i("pengiriman","unsendingDataSize = " + dataSize);
+        for (int i = 0; i < dataSize; i++) {
             try {
                 jsonArray.put(i, unsendingData.get(i).toJSON());
             } catch (JSONException e) {
@@ -90,8 +95,6 @@ public class PengirimanDataService extends Service {
         sendData(jsonObject);
     }
 
-
-
     public PengirimanDataService() { }
 
     private void sendData(JSONObject jsonObject){
@@ -105,10 +108,10 @@ public class PengirimanDataService extends Service {
             for(DataModel data:unsendingData){
                 boolean status = databaseHelper.updateStatusKirim(data);
                 if (!status){
-                    Log.i("pengirim", "Gagal Update Status Kirim Data" + String.valueOf(i));
+                    Log.i("pengirim", "Gagal Update Status Kirim Data" + i); //Todo Bisa dihapus lognya
                 }
                 else{
-                    Log.i("pengirim", "Berhasil Update Status Kirim Data" + String.valueOf(i));
+                    Log.i("pengirim", "Berhasil Update Status Kirim Data" + i);
                 }
                 i++;
             }
@@ -125,6 +128,9 @@ public class PengirimanDataService extends Service {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            if (sharedPreferences.getInt(Preferences.ID_USER, 0) == 0) {
+               createJobScheduler();
+            }
             SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
             preferencesEditor.putInt(Preferences.USER_MAKS, userMaks);
             preferencesEditor.putInt(Preferences.ID_USER, userID);
@@ -133,18 +139,14 @@ public class PengirimanDataService extends Service {
             databaseHelper.hapusData();
             stopService(intent);
         }, error -> {
-            Intent intent1 = new Intent(PengirimanDataService.this, ReceiverPerubahanJaringan.class);
-            intent1.setAction("com.example.gpc1.ACTION");
-            ComponentName componentName = new ComponentName(getApplicationContext().getPackageName(), "com.example.gpc1.receiver.ReceiverPerubahanJaringan");
-            intent1.setComponent(componentName);
-//            PackageManager packageManager = getPackageManager();
-//            List<ResolveInfo> infos = packageManager.queryBroadcastReceivers(intent1, 0);
-//            for (ResolveInfo info:infos){
-//                ComponentName componentName = new ComponentName(info.activityInfo.packageName, info.activityInfo.name);
-//                intent1.setComponent(componentName);
-//                sendBroadcast(intent1);
-//            }
-            sendBroadcast(intent1);
+            int i = sharedPreferences.getInt(Preferences.SCHEDULING_COUNT, 0);
+            if (i > 0){
+                Intent intent1 = new Intent(PengirimanDataService.this, ReceiverPerubahanJaringan.class);
+                intent1.setAction("com.example.gpc1.ACTION");
+                ComponentName componentName = new ComponentName(getApplicationContext().getPackageName(), "com.example.gpc1.receiver.ReceiverPerubahanJaringan");
+                intent1.setComponent(componentName);
+                sendBroadcast(intent1);
+            }
             Log.i("Pengiriman Data", "Gagal " + error);
             notificationGPC.deliverNotification("Pengiriman Data Gagal");
             Calendar calendar = Calendar.getInstance();
@@ -159,5 +161,20 @@ public class PengirimanDataService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+    private void createJobScheduler() {
+        Intent sendingDataIntent = new Intent(this, ReceiverPengirimanData.class);
+        PendingIntent sendingDataPendingIntent = PendingIntent.getBroadcast(this, 0, sendingDataIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        long milis = calendar.getTimeInMillis();
+        System.out.println("IntentService => Memulai Pengiriman Data Awal");
+        if (Build.VERSION.SDK_INT >= 19) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, milis, sendingDataPendingIntent);
+        }
+        else{
+            alarmManager.set(AlarmManager.RTC_WAKEUP, milis, sendingDataPendingIntent);
+        }
     }
 }

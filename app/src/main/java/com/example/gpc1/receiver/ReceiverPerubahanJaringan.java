@@ -30,11 +30,7 @@ public class ReceiverPerubahanJaringan extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         System.out.println("Receiver Perubahan Jaringan");
         Log.i("RecPecJar", intent.getAction());
-        SharedPreferences sharedPreferences = context.getSharedPreferences(Preferences.SHARED_PRE_FILE, Context.MODE_PRIVATE);
-        int i = sharedPreferences.getInt(Preferences.SCHEDULING_COUNT, 0);
-        if (i > 0 ) {
-            createScheduler(context);
-        }
+        createScheduler(context);
     }
 
     private void createScheduler (Context context){

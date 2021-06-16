@@ -105,6 +105,11 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
     @Override
     public void onCreate() {
         super.onCreate();
+        Calendar calendar = Calendar.getInstance();
+//        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC")); #untuk mengubah menjadi utc
+        timeStamp = simpleDateFormat.format(calendar.getTime());
+        System.out.println("IntentServicePerekamanData => Calendar = " + timeStamp);
+        dataRekaman.setTimeStamp(timeStamp);
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor mSuhuUdara = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
         mSuhuCPU = sensorManager.getDefaultSensor(Sensor.TYPE_TEMPERATURE);
@@ -122,11 +127,6 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
         if(mSuhuCPU != null){
             sensorManager.registerListener(this, mSuhuCPU, SensorManager.SENSOR_DELAY_NORMAL );
         }
-        Calendar calendar = Calendar.getInstance();
-//        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC")); #untuk mengubah menjadi utc
-        timeStamp = simpleDateFormat.format(calendar.getTime());
-        System.out.println("IntentServicePerekamanData => Calendar = " + timeStamp);
-        dataRekaman.setTimeStamp(timeStamp);
         suhuBaterai = readBatteryTemp(this);
         FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -208,7 +208,7 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
             preferencesEditor.putFloat(Preferences.LAT_RECENTLY, (float)latitude);
             preferencesEditor.putFloat(Preferences.LONG_RECENTLY, (float)longitude);
             preferencesEditor.apply();
-            if (userMaks == 0 || userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
+            if (userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
                 createJobScheduler();
             }
 //            else{
@@ -220,7 +220,7 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
             databaseHelper.addData(dataRekaman);
             notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
             sensorManager.unregisterListener(IntentServicePerekamanData.this);
-            if (userMaks == 0 || userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
+            if (userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
                 createJobScheduler();
             }
 //            else {
