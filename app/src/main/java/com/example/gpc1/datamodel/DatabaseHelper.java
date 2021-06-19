@@ -9,9 +9,11 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteTableLockedException;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.example.gpc1.Constants;
 import com.example.gpc1.Preferences;
 
 import java.sql.SQLInput;
@@ -142,7 +144,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public ArrayList<DataModel> getUnsendingData(Context context){
         ArrayList<DataModel> returnList= new ArrayList<>();
-        int limit = 35;
+        int limit = (24*60*5)/Constants.PERIODE_REKAMAN_MENIT;
         SharedPreferences sharedPreferences = context.getSharedPreferences(Preferences.SHARED_PRE_FILE, Context.MODE_PRIVATE);
         limit = limit * sharedPreferences.getInt(Preferences.SCHEDULING_COUNT, 0);
         String sqlQuery = "SELECT * FROM "+ TABLE_DB +" WHERE " + COLUMN_DIKIRIM + " = 0 LIMIT " + limit + ";";
@@ -204,9 +206,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         long count = DatabaseUtils.queryNumEntries(db, TABLE_DB);
         db.close();
-        if (count > 3){
+        if (count > 8500){
             SQLiteDatabase db1 = this.getWritableDatabase();
-            return db1.delete(TABLE_DB, COLUMN_DIKIRIM + "?", new String[]{"0",});
+            return db1.delete(TABLE_DB, COLUMN_DIKIRIM + "=?", new String[]{"1"});
         }
         return 0;
     }
