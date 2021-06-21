@@ -62,7 +62,7 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
     NotificationManager notificationManager;
     NotificationGPC notificationGPC;
     @SuppressLint("SimpleDateFormat")
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-M-dd HH:mm:ss");
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-M-dd'T'HH:mm:ssZ");
 
     private SensorManager sensorManager;
     private Sensor mSuhuCPU;
