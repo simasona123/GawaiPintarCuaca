@@ -19,8 +19,8 @@ public class Constants {
         a.put("Special Region of Yogyakarta", "https://data.bmkg.go.id/DataMKG/MEWS/DigitalForecast/DigitalForecast-DIYogyakarta.xml");
         return Collections.unmodifiableMap(a);
     }
-    public static final String URL_SERVER = "http://141.136.47.240/api/send_data";
-    public static final int PERIODE_REKAMAN_MENIT = 5; //TODO Atur waktu 10 menit sesuai dengan permintaan teman
+    public static final String URL_SERVER = "http://141.136.47.240:8000/api/send_data";
+    public static final int PERIODE_REKAMAN_MENIT = 60; //TODO Atur waktu 10 menit sesuai dengan permintaan teman
     public static final int PERIODE_PENGIRIMAN_DATA = 3; //TODO Atur waktu menit sekali
 
 }
