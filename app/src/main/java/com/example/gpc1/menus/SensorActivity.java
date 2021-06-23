@@ -104,16 +104,16 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         Calendar calendar = Calendar.getInstance();
         startAlarmRecordData(this, calendar); //TODO Rekam data offline dan pengiriman data
         rekamDataSaatBukaMenu(); //TODO Rekam Data Saat Buka Menu
-        Intent intentPengirimanData = new Intent(this, PengirimanDataService.class);
-        sharedPreferences = this.getSharedPreferences(Preferences.SHARED_PRE_FILE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("Jaringan", 1);
-        editor.apply();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            this.startForegroundService(intentPengirimanData);
-        } else {
-            this.startService(intentPengirimanData);
-        }
+//        Intent intentPengirimanData = new Intent(this, PengirimanDataService.class);
+//        sharedPreferences = this.getSharedPreferences(Preferences.SHARED_PRE_FILE, Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putInt("Jaringan", 1);
+//        editor.apply();
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            this.startForegroundService(intentPengirimanData);
+//        } else {
+//            this.startService(intentPengirimanData);
+//        }
     }
 
     private void rekamDataSaatBukaMenu(){
