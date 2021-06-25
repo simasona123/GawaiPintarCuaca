@@ -224,12 +224,6 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
                 preferencesEditor.putFloat(Preferences.LAT_RECENTLY, (float)latitude);
                 preferencesEditor.putFloat(Preferences.LONG_RECENTLY, (float)longitude);
                 preferencesEditor.apply();
-                if (userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
-                    createJobScheduler();
-                }
-//            else{
-//                createJobScheduler(); //TODO Pengujian silahkan uncomment
-//            }
             }
             else{
                 dataRekaman.setAltitude1(sharedPreferences.getFloat(Preferences.ALT1_RECENTLY, 0f));

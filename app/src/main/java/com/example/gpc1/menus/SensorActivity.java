@@ -29,7 +29,7 @@ import android.widget.Toast;
 
 import com.example.gpc1.Constants;
 import com.example.gpc1.background.CpuUsageTask;
-import com.example.gpc1.background.PengirimanDataService;
+
 import com.example.gpc1.datamodel.DatabaseHelper;
 import com.example.gpc1.background.IntentServicePerekamanData;
 import com.example.gpc1.receiver.ReceiverPengirimanData;
@@ -105,18 +105,9 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         Calendar calendar = Calendar.getInstance();
         startAlarmRecordData(this, calendar); //TODO Rekam data offline dan pengiriman data
         rekamDataSaatBukaMenu(); //TODO Rekam Data Saat Buka Menu
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                createSendingData();
-            }
-        });
-        thread.start();
+        if (sharedPreferences.getInt(Preferences.ID_USER, 0) != 0) {
+            createSendingData();
+        }
     }
 
     private void rekamDataSaatBukaMenu(){
@@ -137,11 +128,12 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
         long millis = calendar.getTimeInMillis();
+        System.out.println("Pengiriman Data SensorActivity");
         if (Build.VERSION.SDK_INT >= 19) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, millis + 20000, sendingDataPendingIntent);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, millis + 5000, sendingDataPendingIntent);
         }
         else{
-            alarmManager.set(AlarmManager.RTC_WAKEUP, millis + 20000, sendingDataPendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, millis + 5000, sendingDataPendingIntent);
         }
     }
 

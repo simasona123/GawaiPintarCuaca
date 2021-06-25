@@ -162,6 +162,7 @@ public class PengirimanDataService extends Service {
     public IBinder onBind(Intent intent) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
     private void createJobScheduler() {
         Intent sendingDataIntent = new Intent(this, ReceiverPengirimanData.class);
         PendingIntent sendingDataPendingIntent = PendingIntent.getBroadcast(this, 0, sendingDataIntent,
