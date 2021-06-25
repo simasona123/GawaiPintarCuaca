@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,7 +20,10 @@ import android.widget.TextView;
 import com.example.gpc1.Preferences;
 import com.example.gpc1.R;
 import com.example.gpc1.background.PengirimanDataService;
+import com.example.gpc1.receiver.ReceiverPengirimanData;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.Calendar;
 
 
 public class AboutUs extends Activity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -72,17 +77,8 @@ public class AboutUs extends Activity implements BottomNavigationView.OnNavigati
         else{
             linkGithub.setText(Html.fromHtml(linkGithubText));
         }
-        Intent intentPengirimanData = new Intent(this, PengirimanDataService.class);
-        sharedPreferences = this.getSharedPreferences(Preferences.SHARED_PRE_FILE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("Jaringan", 1);
-        editor.apply();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            this.startForegroundService(intentPengirimanData);
-        } else {
-            this.startService(intentPengirimanData);
-        }
     }
+
 
     @SuppressLint("NonConstantResourceId")
     @Override

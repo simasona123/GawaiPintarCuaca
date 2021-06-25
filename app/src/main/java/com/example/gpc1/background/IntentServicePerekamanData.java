@@ -41,8 +41,10 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.CancellationToken;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.OnTokenCanceledListener;
+import com.google.android.gms.tasks.Task;
 
 
 import org.json.JSONArray;
@@ -76,6 +78,7 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
     private double altitude1; //Sudah
     private float suhuBaterai; //sudah
     private float suhuUdara = 0; //sudah
+    private int x = 0;
 
     Location lastLocation;
     Location currentLocation;
@@ -135,14 +138,26 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
             notificationGPC.deliverNotification("Akses Lokasi Diperlukan Pada Setting Aplikasi");
         }
         else{
-            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(listenerLocation);
+            fusedLocationProviderClient.getLastLocation().addOnCompleteListener(listenerLocation);
         }
     }
 
-    private class ListenerLocation implements OnSuccessListener<Location> {
+    private class ListenerLocation implements OnCompleteListener<Location> {
+
         @Override
-        public void onSuccess(Location location) {
-            retrieveLocation(location);
+        public void onComplete(@NonNull Task<Location> task) {
+            if (task.isSuccessful() && task.getResult() != null ) {
+                x = 1;
+                retrieveLocation(task.getResult());
+            }
+            else{
+                Location location = new Location("");
+                location.setLatitude(0);
+                location.setLongitude(0);
+                location.setAltitude(0);
+                updateLocation(location);
+            }
+
         }
     }
 
@@ -180,6 +195,9 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
     }
 
     private void updateLocation(Location location) {
+        sharedPreferences = getSharedPreferences(Preferences.SHARED_PRE_FILE, MODE_PRIVATE);
+        int userMaks = sharedPreferences.getInt(Preferences.USER_MAKS, 0);
+        int userID = sharedPreferences.getInt(Preferences.ID_USER,0);
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         altitude = location.getAltitude();
@@ -194,41 +212,47 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
             dataRekaman.setCpuTemperatur((float)getCurrentCPUTemperature());
         }
         System.out.println("IntentServicePerekemanData -> LocationManager = " + latitude + ", " + longitude + ", "+ altitude);
-        sharedPreferences = getSharedPreferences(Preferences.SHARED_PRE_FILE, MODE_PRIVATE);
-        float selisihLat = Math.abs(sharedPreferences.getFloat(Preferences.LAT_RECENTLY, 1f) - (float)latitude);
-        float selisihLong = Math.abs(sharedPreferences.getFloat(Preferences.LONG_RECENTLY, 1f) - (float)longitude);
-        int userMaks = sharedPreferences.getInt(Preferences.USER_MAKS, 0);
-        int userID = sharedPreferences.getInt(Preferences.ID_USER,0);
-        if (sharedPreferences.getFloat(Preferences.LAT_RECENTLY, 1f) == 1f ||
-                sharedPreferences.getFloat(Preferences.LONG_RECENTLY, 1f) == 1f ||
-                selisihLat >= 0.0002f || selisihLong >= 0.0002f ||
-                sharedPreferences.getFloat(Preferences.ALT1_RECENTLY, 0f) == 0f) {
-            altiOnline1();
-            SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
-            preferencesEditor.putFloat(Preferences.LAT_RECENTLY, (float)latitude);
-            preferencesEditor.putFloat(Preferences.LONG_RECENTLY, (float)longitude);
-            preferencesEditor.apply();
-            if (userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
-                createJobScheduler();
-            }
+        if (x == 1){
+            float selisihLat = Math.abs(sharedPreferences.getFloat(Preferences.LAT_RECENTLY, 1f) - (float)latitude);
+            float selisihLong = Math.abs(sharedPreferences.getFloat(Preferences.LONG_RECENTLY, 1f) - (float)longitude);
+            if (sharedPreferences.getFloat(Preferences.LAT_RECENTLY, 1f) == 1f ||
+                    sharedPreferences.getFloat(Preferences.LONG_RECENTLY, 1f) == 1f ||
+                    selisihLat >= 0.0002f || selisihLong >= 0.0002f ||
+                    sharedPreferences.getFloat(Preferences.ALT1_RECENTLY, 0f) == 0f) {
+                altiOnline1();
+                SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
+                preferencesEditor.putFloat(Preferences.LAT_RECENTLY, (float)latitude);
+                preferencesEditor.putFloat(Preferences.LONG_RECENTLY, (float)longitude);
+                preferencesEditor.apply();
+                if (userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
+                    createJobScheduler();
+                }
 //            else{
 //                createJobScheduler(); //TODO Pengujian silahkan uncomment
 //            }
             }
-        else{
-            dataRekaman.setAltitude1(sharedPreferences.getFloat(Preferences.ALT1_RECENTLY, 0f));
-            databaseHelper.addData(dataRekaman);
-            notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
-            sensorManager.unregisterListener(IntentServicePerekamanData.this);
-            if (userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
-                createJobScheduler();
+            else{
+                dataRekaman.setAltitude1(sharedPreferences.getFloat(Preferences.ALT1_RECENTLY, 0f));
+                databaseHelper.addData(dataRekaman);
+                SharedPreferences.Editor preferencesEditor = sharedPreferences.edit();
+                preferencesEditor.putFloat(Preferences.LAT_RECENTLY, (float)latitude);
+                preferencesEditor.putFloat(Preferences.LONG_RECENTLY, (float)longitude);
+                preferencesEditor.apply();
+                notificationGPC.deliverNotification("Perekaman Data Berhasil. Terima Kasih :D ");
             }
+        }
+        else{
+            dataRekaman.setAltitude1(0);
+            databaseHelper.addData(dataRekaman);
+        }
+        sensorManager.unregisterListener(IntentServicePerekamanData.this);
+        if (userID == 0) { //TODO jangan lupa (userMaks == 0 && userID == 0)
+            createJobScheduler();
+        }
 //            else {
 //                createJobScheduler();  //TODO Jika ingin pengujian silahkan uncomment
 //            }
-            stopService(intent);
-        }
-
+        stopService(intent);
 
     }
 
@@ -267,52 +291,20 @@ public class IntentServicePerekamanData extends Service implements SensorEventLi
 
     private void createJobScheduler() {
         Intent sendingDataIntent = new Intent(this, ReceiverPengirimanData.class);
-        PendingIntent sendingDataPendingIntent = PendingIntent.getBroadcast(this, 0, sendingDataIntent,
+        PendingIntent sendingDataPendingIntent = PendingIntent.getBroadcast(this, 3, sendingDataIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
-        long milis = calendar.getTimeInMillis();
+        long millis = calendar.getTimeInMillis();
         System.out.println("IntentService => Memulai Pengiriman Data Awal");
         if (Build.VERSION.SDK_INT >= 19) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, milis + 10000, sendingDataPendingIntent);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, millis + 10000, sendingDataPendingIntent);
         }
         else{
-            alarmManager.set(AlarmManager.RTC_WAKEUP, milis + 10000, sendingDataPendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, millis + 10000, sendingDataPendingIntent);
         }
     }
 
-//    private long alarm(int userMaks, int userID, Calendar calendar){
-//        System.out.println("IntentService => Memulai Pengiriman Data Tidak Awal");
-//        System.out.println("User Maks = " + userMaks);
-//        System.out.println("User ID = " + userID);
-//        int n = (userMaks / 25 + 1) * 24;
-//        float t = ((float)24 / n ) * userID;
-//        float totalMenit = t * 60;
-//        int jam = (int) totalMenit / 60;
-//        int menit = (int) totalMenit % 60;
-//        System.out.println(t);
-//        System.out.println(jam);
-//        System.out.println(menit);
-//        if (calendar.get(Calendar.HOUR_OF_DAY) >= jam) {
-//            calendar.add(Calendar.DAY_OF_YEAR, 1);
-//        }
-//        calendar.set(Calendar.HOUR_OF_DAY, jam);
-//        calendar.set(Calendar.MINUTE, menit);
-//        calendar.set(Calendar.SECOND, 0);
-//        long milis = calendar.getTimeInMillis();
-//        System.out.print("Alarm => ");
-//        System.out.print(", " + calendar.get(Calendar.DAY_OF_YEAR));
-//        System.out.print(" or " + calendar.get(Calendar.DATE));
-//        System.out.print(", " + calendar.get(Calendar.HOUR_OF_DAY));
-//        System.out.println(", " + calendar.get(Calendar.MINUTE));
-//        return milis;
-//    }
-//
-//    private long tes(long milis){
-//        long x = milis % (60 * 1000 * Constants.PERIODE_REKAMAN_MENIT);
-//        milis  = milis + (60 * 1000 * Constants.PERIODE_REKAMAN_MENIT) - x;
-//        return milis;
-//    }
 //TODO Tidak diperlukan untuk di sini
 
     private boolean statusBaterai(Intent intent) {

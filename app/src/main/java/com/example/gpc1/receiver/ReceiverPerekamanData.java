@@ -34,16 +34,16 @@ public class ReceiverPerekamanData extends BroadcastReceiver{
     }
     private void startAlarm(Context context) {
         Calendar calendar = Calendar.getInstance();
-        long milis = calendar.getTimeInMillis();
-        long x = milis % (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT);
+        long millis = calendar.getTimeInMillis();
+        long x = millis % (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT);
         Intent notifyIntent = new Intent(context, ReceiverPerekamanData.class);
         PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (Build.VERSION.SDK_INT >= 19){
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, milis + (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT - x), notifyPendingIntent);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, millis + (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT - x), notifyPendingIntent);
         }
         else {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, milis +
+            alarmManager.set(AlarmManager.RTC_WAKEUP, millis +
                     (1000 * 60 * Constants.PERIODE_REKAMAN_MENIT - x), notifyPendingIntent);
         }
     }

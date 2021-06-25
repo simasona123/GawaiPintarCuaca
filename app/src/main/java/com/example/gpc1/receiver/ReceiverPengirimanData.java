@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.util.Log;
 
 import com.example.gpc1.Constants;
 import com.example.gpc1.background.PengirimanDataService;
@@ -16,7 +15,7 @@ import com.example.gpc1.Preferences;
 import java.util.Calendar;
 
 public class ReceiverPengirimanData extends BroadcastReceiver {
-    long milis;
+    long millis;
     SharedPreferences sharedPreferences;
 
     @Override
@@ -26,31 +25,31 @@ public class ReceiverPengirimanData extends BroadcastReceiver {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("Jaringan", 1);
         editor.apply();
+        createJobScheduler(context);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intentPengirimanData);
         } else {
             context.startService(intentPengirimanData);
         }
-        createJobScheduler(context);
     }
 
     private void createJobScheduler(Context context) {
         System.out.println("ReceiverPengirimanData");
         Intent sendingDataIntent = new Intent(context, ReceiverPengirimanData.class);
-        PendingIntent sendingDataPendingIntent = PendingIntent.getBroadcast(context, 0, sendingDataIntent,
+        PendingIntent sendingDataPendingIntent = PendingIntent.getBroadcast(context, 3, sendingDataIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
-        milis = calendar.getTimeInMillis();
+        millis = calendar.getTimeInMillis();
         int userMaks = sharedPreferences.getInt(Preferences.USER_MAKS, 0);
         int userID = sharedPreferences.getInt(Preferences.ID_USER, 0);
         if (userID != 0) {
-             milis = alarm(userMaks, userID, calendar, milis); //TODO untuk production
-//           milis = tes(milis);  //TODO untuk pengujian
+             millis = alarm(userMaks, userID, calendar, millis); //TODO untuk production
+//           millis = tes(millis);  //TODO untuk pengujian
             if (Build.VERSION.SDK_INT >= 19) {
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP, milis, sendingDataPendingIntent);
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, millis, sendingDataPendingIntent);
             } else {
-                alarmManager.set(AlarmManager.RTC_WAKEUP, milis, sendingDataPendingIntent);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, millis, sendingDataPendingIntent);
             }
         }
 //        else {

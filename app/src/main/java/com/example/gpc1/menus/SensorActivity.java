@@ -32,6 +32,7 @@ import com.example.gpc1.background.CpuUsageTask;
 import com.example.gpc1.background.PengirimanDataService;
 import com.example.gpc1.datamodel.DatabaseHelper;
 import com.example.gpc1.background.IntentServicePerekamanData;
+import com.example.gpc1.receiver.ReceiverPengirimanData;
 import com.example.gpc1.receiver.ReceiverPerekamanData;
 import com.example.gpc1.Preferences;
 import com.example.gpc1.R;
@@ -104,16 +105,18 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
         Calendar calendar = Calendar.getInstance();
         startAlarmRecordData(this, calendar); //TODO Rekam data offline dan pengiriman data
         rekamDataSaatBukaMenu(); //TODO Rekam Data Saat Buka Menu
-//        Intent intentPengirimanData = new Intent(this, PengirimanDataService.class);
-//        sharedPreferences = this.getSharedPreferences(Preferences.SHARED_PRE_FILE, Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putInt("Jaringan", 1);
-//        editor.apply();
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            this.startForegroundService(intentPengirimanData);
-//        } else {
-//            this.startService(intentPengirimanData);
-//        }
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                createSendingData();
+            }
+        });
+        thread.start();
     }
 
     private void rekamDataSaatBukaMenu(){
@@ -125,6 +128,20 @@ public class SensorActivity extends Activity implements BottomNavigationView.OnN
             this.startForegroundService(intentService);
         } else {
             this.startService(intentService);
+        }
+    }
+    private void createSendingData() {
+        Intent sendingDataIntent = new Intent(this, ReceiverPengirimanData.class);
+        PendingIntent sendingDataPendingIntent = PendingIntent.getBroadcast(this, 3, sendingDataIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        long millis = calendar.getTimeInMillis();
+        if (Build.VERSION.SDK_INT >= 19) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, millis + 20000, sendingDataPendingIntent);
+        }
+        else{
+            alarmManager.set(AlarmManager.RTC_WAKEUP, millis + 20000, sendingDataPendingIntent);
         }
     }
 
